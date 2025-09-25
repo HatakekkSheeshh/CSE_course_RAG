@@ -1,0 +1,62 @@
+Architecture:
+  Backbone:
+    depth:
+    - 3
+    - 6
+    - 3
+    embed_dim:
+    - 64
+    - 128
+    - 256
+    img_size:
+    - 32
+    - 320
+    last_stage: true
+    local_mixer:
+    - - 7
+      - 11
+    - - 7
+      - 11
+    - - 7
+      - 11
+    mixer:
+    - Local
+    - Local
+    - Local
+    - Local
+    - Local
+    - Local
+    - Global
+    - Global
+    - Global
+    - Global
+    - Global
+    - Global
+    name: SVTRNet
+    num_heads:
+    - 4
+    - 8
+    - 16
+    out_channels: 128
+    patch_merging: Conv
+    prenorm: false
+  Head:
+    fc_decay: 0.001
+    name: CTCHead
+  Neck:
+    encoder_type: reshape
+    name: SequenceEncoder
+  Transform: null
+  algorithm: SVTR
+  model_type: rec
+
+Global:
+  model_name: "svtr"
+  algorithm: SVTR
+  max_text_length: 25
+  character_dict_path: en_dict.txt
+  character_type: en
+  use_space_char: true
+
+PostProcess:
+  name: CTCLabelDecode
