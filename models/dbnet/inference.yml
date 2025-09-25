@@ -1,5 +1,5 @@
 Global:
-  model_name: "dbnet"
+  model_name: "PP-OCRv3_server_det"
   use_gpu: false
   save_inference_dir: inference/en_db_res18
 Architecture:

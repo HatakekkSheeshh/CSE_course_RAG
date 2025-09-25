@@ -1,31 +1,25 @@
-from pdf2image import convert_from_path
 from paddleocr import PaddleOCR
-from pathlib import Path
+from pdf2image import convert_from_path
 import numpy as np
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-models = ROOT / "models"
-det_model_path = str(models / "dbnet")
-rec_model_path = str(models / "svtr")
-
+pdf = ROOT / "data" / "CO1005_Introduction_to_Computing" / "Chapter_0.pdf"
+img = np.array(convert_from_path(str(pdf), dpi=220)[0].convert("RGB"))
 
 ocr = PaddleOCR(
-    text_detection_model_dir = det_model_path,
-    text_recognition_model_dir = rec_model_path,
+    ocr_version="PP-OCRv5",
+    det=True,   
+    rec=True, 
+
     use_doc_unwarping=False,
     use_doc_orientation_classify=False,
-    use_textline_orientation = False,                          
+    use_textline_orientation=False,
+
 )
 
-img = convert_from_path(
-    str(ROOT / "data" / "CO1005_Introduction_to_Computing" / "Chapter_0.pdf"),
-    dpi=220
-)[0]
+res = ocr.predict(img)   
 
-res = ocr.ocr(np.array(img.convert("RGB")))  
 for i, line in enumerate(res[0], 1):
     box, (text, conf) = line
-    print(f"#{i}")
-    print("  box :", box)
-    print("  text:", text)
-    print(f"  conf: {conf:.4f}")
+    print(f"#{i}\n  box : {box}\n  text: {text}\n  conf: {conf:.4f}")
