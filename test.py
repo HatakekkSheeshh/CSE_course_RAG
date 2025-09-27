@@ -88,7 +88,6 @@ def result_to_items(result) -> List[Dict]:
 
 def run_with_paddleocr():
     from paddleocr import PaddleOCR
-    # Chỉ dùng các tham số hợp lệ ở 3.2.0
     ocr = PaddleOCR(
         lang = "en",
         use_textline_orientation=False,   
