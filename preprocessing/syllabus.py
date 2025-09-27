@@ -32,7 +32,7 @@ class Document:
     pages: List[Page]
     source_meta: Dict[str,str] = field(default_factory=dict)  # course, faculty,...
 
-# --- Tầng miền dữ liệu (Syllabus) ---
+# --- Data Domain (Syllabus) ---
 @dataclass
 class CourseInfo:
     name_vi: Optional[str]
