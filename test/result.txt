@@ -1,0 +1,91 @@
+09:48, 04/09/2022
+DCMH.CO2011_Mathematical Modeling
+HO CHI MINH CITY UNIVERSITY OF TECHNOLOGY
+BK
+TRUONG DAI HOC BÁCH KHOA - DHQG-HCM
+TP.HCM
+DCMH.CO2011.4.1
+Dai Hoc Quc Gia TP.HCM
+Vietnam National University - HCMC
+Truòng Dai Hoc Bách Khoa
+Ho Chi Minh City University of Technology
+Khoa Khoa hoc và Ky thut Máy tính
+Faculty of Computer Science and Engineering
+DÊ CUONG HQC PHÄN
+Course Syllabus
+1. Thông tin vè hoc phÀn (Course information)
+1.1. Thông tin tông quan (General information)
+- Tên hoc phân: Mò hinh hóa toán hoc
+Course title: Mathematical Modeling
+- Ma hoc phân (Course ID): CO2011
+- Só tin chi (Credits): 3 (ETCS: 6 )
+- Hc ky áp dung (Applied from semester): 20221
+- T chúc hoc phàn (Course format):
+Hinh thúrc hoc tp
+Só tit/giò
+Só tín chi
+Ghi chú
+(Teaching/study type)
+(Hours)
+(Credits)
+(Notes)
+Ly thuyt (LT)
+30
+(Lectures)
+Thåo lun (ThL)/Thuc hành tai lóp (TH)
+0
+(Tutorial)
+Thí nghim (TNg)/Thuc tp xung (TT)
+0
+(Labs/Practices)
+Bài tp lón (BTL)/Dò án (DA)
+45
+(Projects)
+Tu hc (Self-study)
+105
+Khác (Others)
+0
+Tng cng (Total)
+137.5
+3
+- Ty l dánh giá và hinh thúc kim tra/thi (Evaluation form & ratio)
+Hinh thurc dánh giá
+Ty l
+Hinh thure
+Thòi gian
+(Evaluation type)
+(Ratio)
+(Format)
+(Duration)
+Thäo lun (ThL)/Thuc hành tai lóp (TH)
+(Tutorial)
+Thi nghim
+(Labs/Practices)
+Bài tp lón (BTL)/Dò án (DA)
+20%
+(Projects)
+Kiêm tra
+40%
+Trc nghim và tu lun
+70 phút (minutes)
+(Midterm Exam)
+(MCQ & Constructed response)
+Thi
+40%
+Trâc nghim và ty lun
+80 phút (minutes)
+(Final Exam)
+(MCQ & Constructed response)
+Tông cng
+100%
+(Total)
+268 Ly Thuòng Kit, Phuòng 14, Qun 10, TP.HCM
+268 Ly Thuong Kict St., Ward 14, Dist. 10, Ho Chi Minh City, Vietnam
+Din thoai: 028 3864 7256
+Phone: 028 3864 7256
+www.hcmut.edu.vn
+studeersnel
+www.hcmut.edu.vn
+Dit document is beschikbaar op
+1/9
+Downloaded by Hanh Nguyen (hanh91520@gmail.com)

@@ -4,7 +4,6 @@ from pdf2image import convert_from_path
 from PIL import Image
 from typing import List, Tuple
 
-# ---------- Utils ----------
 def approx_tokens(s: str) -> int:
     return max(1, math.ceil(len(s) / 4))  # ~4 chars/token
 
@@ -45,3 +44,4 @@ def file_to_images(path: Path, dpi=220) -> List[Image.Image]:
             return pages
     else:
         return []
+    
