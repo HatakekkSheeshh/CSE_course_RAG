@@ -1,5 +1,9 @@
 from preprocessing.convert_data_to_img import *
 from preprocessing.dectector import OCRTextDetector
+from preprocessing.extract_syllabus import extract_syllabus
+from dataclasses import asdict
+import json 
+from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 
@@ -23,14 +27,28 @@ def data_cvt():
 def main():
     """ Pipeline """ 
     # Initialize
-    detector = OCRTextDetector(out_dir="./test")
+    detector = OCRTextDetector(out_dir="./test1 ")
 
     # Converting to PNG
-    data_cvt()
+    print("Converting...")
+    # data_cvt()
 
     # Detecting & Recognizing text 
-    img_path = ROOT / "data_cvt" / "CO2011_MaThematical Modeling" / "Syllabus" / "slide_001.png"
-    detector.run(str(img_path))
+    print("Detecting...")
+    img_path = ROOT / "data_cvt" / "CO1027_Programming_Fudamentals" / "Syllabus" / "slide_001.png"
+    items = detector.run(str(img_path))
+
+    # Filter [key: value]
+    print("Extracting...")
+    syllabus = extract_syllabus(items)
+    out_dir = ROOT / "test2"
+    out_dir.mkdir(parents=True, exist_ok=True)
+    out_json = out_dir / "syllabus_extracted.json"
+
+    with out_json.open("w", encoding="utf-8") as f:
+        json.dump(asdict(syllabus), f, ensure_ascii=False, indent=2)
+
+    print(f"[OK] Saved JSON to {out_json}")
 
 if __name__ == "__main__":
     main()

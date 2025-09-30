@@ -2,8 +2,8 @@ from dataclasses import dataclass, field
 from typing import List, Optional, Literal, Dict, Tuple
 
 # --- OCR/Layout ---
-BBox = Tuple[float, float, float, float]  # x1,y1,x2,y2 (or your 4-pt polygon)
-Polygon = List[Tuple[float, float]]
+BBox = Tuple[float, float, float, float]    # x1,y1,x2,y2
+Polygon = List[Tuple[float, float]]         # (x1,y1) (x1, y2) (x2, y1) (x2, y2)
 
 @dataclass
 class OCRItem:
@@ -30,19 +30,30 @@ class Document:
     doc_id: str
     file_name: str
     pages: List[Page]
-    source_meta: Dict[str,str] = field(default_factory=dict)  # course, faculty,...
+    source_meta: Dict[str,str] = field(default_factory=dict)    # course, faculty,...
 
-# --- Data Domain (Syllabus) ---
+""" --- Data Domain (Syllabus) --- """
 @dataclass
+# Slide 1st
 class CourseInfo:
-    name_vi: Optional[str]
-    name_en: Optional[str]
-    course_id: Optional[str]
-    ects: Optional[float]
-    credits: Optional[float]
-    applied_semester: Optional[str]
-    course_format: Dict[str, float]  # {"Lecture_hours":30, "Lab_hours":20, ...}
+    title: Optional[str]                                        # Course title: Mathematical Modeling
+    course_id: Optional[str]                                    # CO2011    
+    credits: Optional[int]                                      # 3
+    applied_semester: Optional[str]                             # 20211
+    course_format: Dict[str, float]                             # {"Lecture_hours":30, "Lab_hours":20, ...}
 
+    @property
+    def etcs(self):
+        return credits * 2
+
+@dataclass
+class AssessmentComponent:
+    name: str                                                   # Midterm, Final, Project, Lab...
+    ratio: float                                                # 20%, 40%...
+    format: Optional[str]                                       # MCQ, written, practice...
+    duration_min: Optional[int]                                 # 70, 80 minutes
+
+# Slide 2nd
 @dataclass
 class Prerequisite:
     course_id: Optional[str]
@@ -73,13 +84,6 @@ class LearningOutcomeItem:
     mapped_assessment: List[str]                                # e.g., ["Midterm","Final","Large assignment"]
 
 @dataclass
-class AssessmentComponent:
-    name: str                                                   # Midterm, Final, Project, Lab...
-    ratio: float                                                # 0.1 ~ 1.0
-    format: Optional[str]                                       # MCQ, written, practice...
-    duration_min: Optional[int]
-
-@dataclass
 class TeachingMethod:
     name: str                                                   # blended, lecture, practice...
     notes: Optional[str]=None
@@ -87,15 +91,13 @@ class TeachingMethod:
 @dataclass
 class SessionPlan:
     session_no: int
-    topics_vi: List[str]
-    topics_en: List[str]
+    topics: List[str]
     learning_outcomes: List[str]                                # references to LO codes
     activities: List[str]                                       # lecturer/student activities
 
 @dataclass
 class StudyGuideline:
-    notes_vi: Optional[str]
-    notes_en: Optional[str]
+    notes: Optional[str]
 
 @dataclass
 class EditingInfo:
@@ -105,16 +107,20 @@ class EditingInfo:
 
 @dataclass
 class Syllabus:
+    # Slide 1st
     course_info: CourseInfo
+    assessments: List[AssessmentComponent]
+
+    """
     prerequisites: List[Prerequisite]
     knowledge_block: Optional[str]                              # Foundation/Major/...
     unit_in_charge: Optional[UnitInCharge]
     materials: List[Material]
     learning_outcomes: List[LearningOutcomeItem]
-    assessments: List[AssessmentComponent]
     teaching_methods: List[TeachingMethod]
     session_plan: List[SessionPlan]
     study_guidelines: Optional[StudyGuideline]
     other_requirements: Optional[str]
     editing_info: Optional[EditingInfo]
     anchors: Dict[str, Polygon] = field(default_factory=dict)   # heading polygons for traceability
+    """

@@ -1,0 +1,85 @@
+HO CHI MINH CITY UNIVERSITY OF TECHNOLOGY
+BK
+TP.HCM
+TRUÖNG DAI HQC BÁCH KHOA - DHQG-HCM
+DCMH.CO1027.5.1
+Dai Hoc Quc Gia TP.HCM
+Vietnam National University - HCMC
+Truòng Dai Hoc Bách Khoa
+Ho Chi Minh City University of Technology
+Khoa Khoa hoc và K thut Máy tính
+Faculty of Computer Science and Engineering
+DÊ CUONG HOC PHAN
+Course Syllabus
+1. Thông tin vê hoc phân (Course information)
+1.1. Thông tin tng quan (General information)
+- Tên hoc phn: Ky thut lâp trinh
+Course title: Programming Fundamentals
+- Ma hoc phân (Course ID): CO1027
+- S tín chi (Credits): 3 (ETCS: 6 )
+- Hoc ky áp dung (Applied from semester): 20221
+- T chúc hoc phàn (Course format):
+Hinh thurc hoc tp
+Só tiét/giò
+S tin chi
+Ghi chú
+(Teaching/study type)
+(Hours)
+(Credits)
+(Notes)
+Ly thuyt (LT)
+30
+(Lectures)
+Thåo lun (ThL)/Thuc hành tai lóp (TH)
+0
+(Tutorial)
+Thí nghim (TNg)/Thuc tp xung (TT)
+15
+(Labs/Practices)
+Bài tp lón (BTL)/Dò án (DA)
+25
+(Projects)
+Tu hc (Self-study)
+78.5
+Khác (Others)
+0
+Tng cng (Total)
+150
+3
+- Ty l dánh giá và hinh thúc kim tra/thi (Evaluation form & ratio)
+Hinh thúrc dánh giá
+Ty le
+Hinh thurc
+Thòi gian
+(Evaluation type)
+(Ratio)
+(Format)
+(Duration)
+Thåo lun (ThL)/Thuc hành tai lóp (TH)
+(Tutorial)
+Thi nghim
+30%
+(Labs/Practices)
+Bài tp lón (BTL)/Dò án (A)
+30%
+(Projects)
+Kim tra
+--
+-- phút (minutes)
+(Midterm Exam)
+(--)
+Thi
+40%
+Trâc nghim và tu lun
+90 phút (minutes)
+(Final Exam)
+(MCQ & Constructed response)
+Tng cng
+100%
+(Total)
+268 L Thuòng Kit, Phuòng 14, Qun 10, TP.HCM
+268 Ly Thuong Kiet St., Ward 14, Dist. 10, Ho Chi Minh City, Vietnam
+Din thoai: 028 3864 7256
+Phone: 028 3864 7256
+www.hcmut.edu.vn
+www.hcmut.edu.vn
