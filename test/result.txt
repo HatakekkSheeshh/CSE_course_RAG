@@ -1,0 +1,94 @@
+8/17/23, 11:05 AM
+DCMH.CO1005_Introduction to Computing
+HO CHI MINH CITY UNIVERSITY OF TECHNOLOGY
+BK
+TRUÖNG DAI HQC BÁCH KHOA - DHQG-HCM
+TP.HCM
+Dai Hoc Quôc Gia TP.HCM
+Vietnam National University - HCMC
+Truròng Dai Hoc Bách Khoa
+Ho Chi Minh City University of Technology
+Khoa Khoa hoc và K thut Máy tính
+Faculty of Computer Science and Engineering
+D CUONG HQC PHÄN
+Course Syllabus
+1. Thông tin vè hoc phÀn (Course information)
+1.1. Thông tin tông quan (General information)
+- Tên hoc phân: Nhâp mön din toán
+- Course title: Introduction to Computing
+- M hoc phân (Course ID): CO1005
+- Só tin chi (Credits): 3 (ETCS: 6 )
+- Hoc ky áp dung (Applied from semester): 20231
+- T chúc hoc phân (Course format):
+Hinh thrc hoc tp
+Só tiét/giò
+Só tin chi
+Ghi chú
+(Teaching/study type)
+(Hours)
+(Credits)
+(Notes)
+Ly thuyt (LT)
+30
+2
+(Lectures)
+Thåo lun (ThL)/Thuc hành tai lóp (TH)
+(Tutorial)
+Thí nghim (TNg)/Thuc tp xung (TT)
+20
+0.7
+(Labs/Practices)
+Bài tp lón (BTL)/Dò án (A)
+15
+0.3
+(Projects)
+Ty hc (Self-study)
+83
+Khác (Others)
+Tng cng (Total)
+50
+3
+(Ghi chú: Cáu hình môn hc mâu undefined - )
+- Ty l dánh giá và hinh thúc kim tra/thi (Evaluation form & ratio)
+Hinh thrc dánh gia
+Ty le
+Hinh thurc
+Thòi gian
+(Evaluation type)
+(Ratio)
+(Format)
+(Duration)
+Thäo lun (ThL)/Thuc hành tai lóp (TH)
+(Tutorial)
+Thi nghim
+10%
+(Labs/Practices)
+Bài tp lón (BTL)/Dô án (DA)
+30%
+(Projects)
+Kim tra
+30%
+Trâc nghim
+60 phút (minutes)
+(Midterm Exam)
+(Multiple choice (MCQ))
+Thi
+30%
+Trac nghim
+60 phút (minutes)
+(Final Exam)
+(Multiple choice (MCQ))
+Tng cng
+100%
+(Total)
+268 Ly Thuòng Kit, Phuòng 14, Qun 10, TP.HCM
+268 Ly Thuong Kiet St., Ward 14, Dist. 10, Ho Chi Minh City, Vietnam
+Din thoai: 028 3864 7256
+Phone: 028 3864 7256
+www.hcmut.edu.vn
+studeersnel
+www.hcmut.edu.vn
+Dit document is beschikbaar op
+about:blank
+1/7
+Downloaded by Hanh Nguyen (hanh91520@gmail.com)

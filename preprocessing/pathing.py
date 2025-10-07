@@ -70,7 +70,7 @@ def ensure_layout_for_source(
     data_cvt_root: Path = Path("data_cvt"),
 ) -> DestLayout:
     """
-    Setup objects for class DestLayout:
+    Setup objects' paths for class DestLayout:
 
     - Build the target folder layout for a source file located under:
         data_cvt/<COURSE_DIR>/...

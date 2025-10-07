@@ -38,11 +38,11 @@ def y_of_label(recs, pattern, matching=0) -> Optional[float]:
         return None
    
     hits.sort(key=lambda r: (r["y"], r["x"]))
-    print(f"Hits: \n{hits}")
+    # print(f"Hits: \n{hits}")
     matching = max(0, min(matching, len(hits)-1))
-    print(f"Matching: {matching}")
+    # print(f"Matching: {matching}")
     y = hits[matching]["y"]
-    print(f"Y: {y}")
+    # print(f"Y: {y}")
     return y
 
 def value_in_col(recs, y, tol=40, x_min=640, x_max=760, regex=r"\d+(?:\.\d+)?"):
@@ -91,9 +91,11 @@ def extract_syllabus(items) -> Syllabus:
     # Assessments
     asses: List[AssessmentComponent] = []
     rows = [
-        ("Projects",     RX["ass_project"],     1),
-        ("Midterm Exam", RX["ass_midterm"],     0),
-        ("Final Exam",   RX["ass_final"],       0),
+        ("Tutorial",        RX["tutorial"],             1),
+        ("labs_practices",  RX["labs"],                 1),
+        ("Projects",        RX["ass_project"],          1),
+        ("Midterm Exam",    RX["ass_midterm"],          0),
+        ("Final Exam",      RX["ass_final"],            0),
     ]
 
     for name, lab_pat, matching in rows:
@@ -106,13 +108,13 @@ def extract_syllabus(items) -> Syllabus:
         if y is not None:
             # Ratio
             ratio    = value_in_col(recs, y, tol=40, x_min=630, x_max=720,  regex=RX["ass_ratio"])
-            print(f"Ratio: {ratio}")
+            # print(f"Ratio: {ratio}")
             # Format
             fmt_cell = value_in_col(recs, y, tol=40, x_min=730, x_max=1120, regex=RX["ass_format"])
-            print(f"Format: {fmt_cell}")
+            # print(f"Format: {fmt_cell}")
             # Duration
             duration = value_in_col(recs, y, tol=40, x_min=1120, x_max=1360, regex=RX["ass_duration"])
-            print(f"Duration: {duration}")
+            # print(f"Duration: {duration}")
         
         asses.append(AssessmentComponent(
             name=name, ratio=ratio, format=fmt_cell, duration_min=duration
@@ -125,12 +127,6 @@ def extract_syllabus(items) -> Syllabus:
         applied_semester=applied_sem,
         course_format=fmt,
     )
-
-
-
-
-
-
     
     return Syllabus(course_info=ci, assessments=asses)
 

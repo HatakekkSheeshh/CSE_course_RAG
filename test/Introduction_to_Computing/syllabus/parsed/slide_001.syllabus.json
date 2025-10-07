@@ -1,0 +1,47 @@
+{
+  "course_info": {
+    "title": "Introduction to Computing",
+    "course_id": "CO1005",
+    "credits": "3",
+    "applied_semester": "20231",
+    "course_format": {
+      "lectures": "30",
+      "labs_practices": "20",
+      "projects": "15",
+      "self_study": "83",
+      "total_hours": "50"
+    }
+  },
+  "assessments": [
+    {
+      "name": "Tutorial",
+      "ratio": null,
+      "format": null,
+      "duration_min": null
+    },
+    {
+      "name": "labs_practices",
+      "ratio": "10",
+      "format": null,
+      "duration_min": null
+    },
+    {
+      "name": "Projects",
+      "ratio": "30",
+      "format": null,
+      "duration_min": null
+    },
+    {
+      "name": "Midterm Exam",
+      "ratio": "30",
+      "format": "MCQ",
+      "duration_min": "60"
+    },
+    {
+      "name": "Final Exam",
+      "ratio": "30",
+      "format": "MCQ",
+      "duration_min": "60"
+    }
+  ]
+}

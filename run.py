@@ -4,24 +4,18 @@ import json
 from dataclasses import asdict
 from typing import Dict, List, Optional
 
-# Your existing modules
 from preprocessing.convert_data_to_img import convert_chapters_and_syllabus_to_images_parallel
 from preprocessing.dectector import OCRTextDetector
 from preprocessing.extract_syllabus import extract_syllabus
 
-# Output-organizing helpers
 from preprocessing.organize import save_ocr_result
-from preprocessing.pathing import ensure_layout_for_source, extract_course_name
+from preprocessing.pathing import extract_course_name
 
 ROOT = Path(__file__).resolve().parent
 
 
 # ---------- Function Helpers ----------
 def _find_child_dir_casefold(parent: Path, name_cf: str) -> Optional[Path]:
-    """
-    Return the first direct child dir of `parent` that equals `name_cf`
-    case-insensitively. None if not found.
-    """
     for child in parent.iterdir():
         if child.is_dir() and child.name.casefold() == name_cf:
             return child
@@ -95,10 +89,11 @@ def main(do_convert: bool = False):
     total_images = 0
     for course_dir, images in images_by_course.items():
         course_name = extract_course_name(course_dir.name)
-        print(f"\n=== Course: {course_name}  ({course_dir}) ===")
+        print(f"\n\n=== Course: {course_name}  ({course_dir}) ===")
         processed = 0
 
         for img_path in images:
+            print(f"--- Processing image: {img_path.name}")
             if not img_path.exists():
                 continue
 
@@ -116,8 +111,8 @@ def main(do_convert: bool = False):
                 src_file=img_path,
                 items=items,
                 plain_text=plain_text,
-                annotated_image=None,       # pass a path or PIL image if rendering bboxes is necessary
-                copy_source_image=False,    # set True to copy originals into images/
+                annotated_image=ROOT / "scratch" / "annotated.png",       # pass a path or PIL image if rendering bboxes is necessary
+                copy_source_image=True,    # set True to copy originals into images/
                 data_root=ROOT / "data",
                 data_cvt_root=ROOT / "data_cvt",
                 extra_meta={"engine": "paddleocr"},
@@ -134,7 +129,9 @@ def main(do_convert: bool = False):
             if out_paths['text']:
                 print(f"     TEXT      : {out_paths['text']}")
             print(f"     PARSED    : {parsed_json}")
+            print("\n")
 
+        
             processed += 1
             total_images += 1
 

@@ -1,116 +1,119 @@
-# ocr_basic_v320_fixed2.py
+from __future__ import annotations
 from pathlib import Path
-import json, sys
-import numpy as np
-import cv2, tempfile
-from typing import List, Dict
+import json
+from dataclasses import asdict
+from typing import Dict, List, Optional
 
-IMG_PATH = Path("/mnt/d/Project/AI_project/data_cvt/CO1005_Introduction_to_Computing/Syllabus/slide_001.png")
-OUT_DIR  = Path("./ocr_out_v320")
-SCORE_THR = 0.5
-OUT_DIR.mkdir(parents=True, exist_ok=True)
+from preprocessing.convert_data_to_img import convert_chapters_and_syllabus_to_images_parallel
+from preprocessing.dectector import OCRTextDetector
+from preprocessing.extract_syllabus import extract_syllabus
 
-def write_txt_json(items):
-    (OUT_DIR / "result.txt").write_text(
-        "\n".join([it["text"] for it in items if it["score"] >= SCORE_THR]),
-        encoding="utf-8"
-    )
-    (OUT_DIR / "result.json").write_text(
-        json.dumps(items, indent=2, ensure_ascii=False), encoding="utf-8"
-    )
+from preprocessing.organize import save_ocr_result
+from preprocessing.pathing import extract_course_name
 
-def draw_polys(items, img_bgr):
-    img = img_bgr.copy()
-    for it in items:
-        if it["score"] < SCORE_THR:
-            continue
-        pts = np.array(it["polygon"], dtype=np.int32)
-        cv2.polylines(img, [pts], True, (0, 255, 0), 2)
-        x, y = pts[0]
-        cv2.putText(img, f'{it["text"]} ({it["score"]:.2f})',
-                    (int(x), int(y)-5),
-                    cv2.FONT_HERSHEY_SIMPLEX, 0.5, (36,36,255), 1, cv2.LINE_AA)
-    cv2.imwrite(str(OUT_DIR / "annotated.png"), img)
+from preprocessing.overlay import write_svg_overlay
 
-def light_preproc(img_path: Path):
-    img = cv2.imread(str(img_path))
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    gray = cv2.bilateralFilter(gray, 7, 50, 50)
-    return cv2.cvtColor(gray, cv2.COLOR_GRAY2BGR)
+ROOT = Path(__file__).resolve().parent
 
-def pick(d, keys):
-    """ Return first satisfied key in d """
-    for k in keys:
-        if k in d and d[k] is not None:
-            return d[k]
+
+# ---------- Function Helpers ----------
+def _find_child_dir_casefold(parent: Path, name_cf: str) -> Optional[Path]:
+    for child in parent.iterdir():
+        if child.is_dir() and child.name.casefold() == name_cf:
+            return child
     return None
 
-def xyxy_to_quad(box):
-    x1, y1, x2, y2 = map(float, box)
-    return [[x1, y1], [x2, y1], [x2, y2], [x1, y2]]
 
-def result_to_items(result) -> List[Dict]:
+def collect_syllabus_images_by_course(root: Path) -> Dict[Path, List[Path]]:
     """
-    Standardize OCRResult (dict-like):
-      [{ "text": str, "score": float, "polygon": [[x,y],...4 points) }]
+    Return a mapping of:
+        { <course_dir_path>: [list of image paths under its Syllabus/**] }
+    Courses without a Syllabus/ folder are omitted.
     """
-    items: List[Dict] = []
+    data_cvt = root / "data_cvt"
+    image_exts = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tif", ".tiff"}
+    out: Dict[Path, List[Path]] = {}
 
-    texts  = pick(result, ["texts", "rec_texts"])
-    scores = pick(result, ["scores", "rec_scores"])
+    if not data_cvt.is_dir():
+        return out
 
-    boxes = pick(result, ["boxes", "dt_polys", "rec_polys", "det_polys"])
-    xyxy  = None
-    if boxes is None:
-        xyxy = pick(result, ["rec_boxes"])  # [x1,y1,x2,y2]
+    for course_dir in sorted([p for p in data_cvt.iterdir() if p.is_dir()]):
+        syllabus_dir = _find_child_dir_casefold(course_dir, "syllabus")
+        if syllabus_dir is None:
+            continue
 
-   
-    if texts is None or scores is None or (boxes is None and xyxy is None):
-        return items
+        imgs = [p for p in syllabus_dir.rglob("*")
+                if p.is_file() and p.suffix.lower() in image_exts]
+        if imgs:
+            out[course_dir] = sorted(imgs)
+    return out
 
-    # Standardize number of elements
-    n = min(len(texts), len(scores),
-            len(boxes) if boxes is not None else len(xyxy))
 
-    for i in range(n):
-        if boxes is not None:
-            poly = np.asarray(boxes[i]).tolist()    # [[x,y],...4]
-        else:
-            poly = xyxy_to_quad(xyxy[i])            # xyxy -> quad
+# ---------- Pipeline ----------
+def main(do_convert: bool = False):
+    """
+    End-to-end pipeline (Syllabus-only, grouped by course):
+      1) (optional) Convert PDFs -> images into data_cvt/
+      2) Build {course_dir: [Syllabus images]}
+      3) For each course:
+           - OCR each image -> items
+           - Extract syllabus from items
+           - Persist into data/<course>/syllabus/{ocr_json,text,annotated?,images?}
+    """
+    # data_root = ROOT / "data"
+    # data_cvt_root = ROOT / "data_cvt"
 
-        items.append({
-            "text":  str(texts[i]),
-            "score": float(scores[i]),
-            "polygon": [[float(x), float(y)] for x, y in poly],
-        })
+    # 1) Convert (optional). Converter may generate multiple outputs,
+    if do_convert:
+        print("Converting (may generate both Chapters and Syllabus outputs)...")
+        _ = convert_chapters_and_syllabus_to_images_parallel(
+            data_root=ROOT / "data_raw",
+            out_root=ROOT / "data_cvt",
+            dpi=220,
+            fmt="png",
+            overwrite=False,
+            keep_temp_pdf=False,
+            max_workers=3,
+        )
 
-    return items
+    print("Detecting (OCR)...")
+    out_dir = ROOT / "test"  # For debug outputs (JSON, annotated.png)
+    # out_dir = None
+    detector = OCRTextDetector(out_dir=str(out_dir))  
 
-def run_with_paddleocr():
-    from paddleocr import PaddleOCR
-    ocr = PaddleOCR(
-        lang = "en",
-        use_textline_orientation=False,   
-        use_doc_orientation_classify=False, 
-        use_doc_unwarping=False             
+    img_path = ROOT / "data_cvt" / "CO1005_Introduction_to_Computing" / "Syllabus" / "slide_001.png"
+
+    print(f"--- Processing image: {img_path.name}")
+    items = detector.run(str(img_path))
+    plain_text = " ".join([it.get("text", "") for it in items if it.get("text")])
+    syllabus = extract_syllabus(items)
+    out_paths, layout = save_ocr_result(
+        src_file=img_path,
+        items=items,
+        plain_text=plain_text,
+        annotated_image=ROOT / "scratch" / "annotated.png",                   # pass a path or PIL image if rendering bboxes is necessary
+        copy_source_image=True,                 # set True to copy originals into images/
+        data_root=ROOT / "test",
+        data_cvt_root=ROOT / "data_cvt",
+        extra_meta={"engine": "paddleocr"},
     )
+    overlay_svg = write_svg_overlay(img_path, items, layout.annotated)
+    print(f"     ANNOTATED: {overlay_svg}")
 
-    BASENAME = IMG_PATH.stem
-    TMP_DIR = Path(tempfile.gettempdir())
-    tmp_path = TMP_DIR / f"{BASENAME}_prep.png"
+    parsed_dir = layout.syllabus_root / "parsed"
+    parsed_dir.mkdir(parents=True, exist_ok=True)
+    parsed_json = parsed_dir / f"{img_path.stem}.syllabus.json"
+    parsed_json.write_text(json.dumps(asdict(syllabus), ensure_ascii=False, indent=2), encoding="utf-8")
 
-    img_bgr = light_preproc(IMG_PATH)
-    cv2.imwrite(str(tmp_path), img_bgr)
-    ite = iter(ocr.predict(input = str(tmp_path)))
-    result = next(ite) 
+    print(f"[OK] {img_path.name}")
+    print(f"     OCR JSON  : {out_paths['json']}")
+    if out_paths['text']:
+        print(f"     TEXT      : {out_paths['text']}")
+    print(f"     PARSED    : {parsed_json}")
+    print("\n")
 
-    result.save_to_img(str(OUT_DIR))
-    result.save_to_json(str(OUT_DIR))
+    print(f"\nAll done.")
 
-    items = result_to_items(result)
-    write_txt_json(items)
-    draw_polys(items, img_bgr)
 
 if __name__ == "__main__":
-    run_with_paddleocr()
-    print(f"Saved outputs in: {OUT_DIR.resolve()}")
+    main(do_convert=False)

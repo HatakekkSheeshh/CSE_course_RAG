@@ -5,12 +5,13 @@ import numpy as np
 from pathlib import Path
 import json
 
-json_path = Path("test2/syllabus_extracted.json")
+json_path = Path("test/Introduction_to_Computing/syllabus/parsed/slide_001.syllabus.json")
 
 with open(json_path, "r", encoding="utf-8") as f:
     data = json.load(f)
 
 def canonical_course_card(d: Dict) -> str:
+    """ course_info """
     ci = d["course_info"]
     fmt = ci["course_format"]
     # Nhất quán đơn vị giờ, số thập phân, và thứ tự trường để embedding ổn định
@@ -25,6 +26,7 @@ def canonical_course_card(d: Dict) -> str:
     )
 
 def canonical_assessment(a: Dict, course_id: str) -> str:
+    """ assessments """
     ratio = (a.get("ratio") and f"{a['ratio']}%") or "N/A"
     duration = (a.get("duration_min") and f"{a['duration_min']} min") or "N/A"
     fmt = a.get("format") or "N/A"
@@ -67,14 +69,14 @@ records = [
 ]
 
 print(f"Records: {records}")
-# 3) (Tuỳ chọn) Đưa vào FAISS dùng cosine (IP với vectors đã normalize)
-# import faiss
-# dim = embeddings.shape[1]
-# index = faiss.IndexFlatIP(dim)
-# index.add(embeddings.astype(np.float32))
-# # Lúc truy vấn:
-# q = "What is the duration and format of the final exam of CO1027?"
-# q_emb = model.encode([q], normalize_embeddings=True).astype(np.float32)
-# D, I = index.search(q_emb, k=3)
-# hits = [records[i] for i in I[0]]
-# print(hits[0]["text"])
+
+import faiss
+dim = embeddings.shape[1]
+index = faiss.IndexFlatIP(dim)
+index.add(embeddings.astype(np.float32))
+# Lúc truy vấn:
+q = "What is the duration and format of the final exam of CO1027?"
+q_emb = model.encode([q], normalize_embeddings=True).astype(np.float32)
+D, I = index.search(q_emb, k=3)
+hits = [records[i] for i in I[0]]
+print(hits[0]["text"])
