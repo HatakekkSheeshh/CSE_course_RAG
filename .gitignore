@@ -218,3 +218,7 @@ __marimo__/
 ./data_cvt
 data_cvt/
 data_cvt
+
+./data
+data/
+data

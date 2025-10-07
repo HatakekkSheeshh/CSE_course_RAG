@@ -125,6 +125,13 @@ def extract_syllabus(items) -> Syllabus:
         applied_semester=applied_sem,
         course_format=fmt,
     )
+
+
+
+
+
+
+    
     return Syllabus(course_info=ci, assessments=asses)
 
 
