@@ -19,9 +19,9 @@ def canonical_course_card(d: Dict) -> str:
         f"Course: {ci['title']} ({ci['course_id']}). "
         f"Credits: {ci['credits']}. Applied semester: {ci['applied_semester']}. "
         "Format: "
-        f"lectures {fmt['lectures']}h; tutorial {fmt['tutorial']}h; "
+        f"lectures {fmt['lectures']}h; "
         f"labs/practices {fmt['labs_practices']}h; projects {fmt['projects']}h; "
-        f"self-study {fmt['self_study']}h; others {fmt['others']}h; "
+        f"self-study {fmt['self_study']}h; "
         f"total {fmt['total_hours']}h."
     )
 

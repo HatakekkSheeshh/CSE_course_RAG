@@ -1,3 +1,13 @@
+"""
+Preprocessing utilities for organizing course syllabus data.
+Store OCR outputs into the normalized syllabus layout:
+    data/<course>/syllabus/
+    - ocr_json/<stem>.ocr.json
+    - text/<stem>.txt                  (if plain_text provided)
+    - images/<original-name>           (if copy_source_image=True)
+    - annotated/<name>                 (if annotated_image is provided)
+"""
+
 from __future__ import annotations
 from pathlib import Path
 import re
@@ -30,7 +40,7 @@ def sanitize_folder_name(name: str) -> str:
 
 def extract_course_name(course_dir_name: str) -> str:
     """
-    Try to infer <course name> from the course directory name.
+    Infer <course name> from the course directory name.
     If no pattern matches, return a sanitized version of the original folder name.
     """
     for pat in COURSE_DIR_PATTERNS:

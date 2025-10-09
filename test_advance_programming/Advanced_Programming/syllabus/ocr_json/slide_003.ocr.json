@@ -1,0 +1,1197 @@
+{
+  "meta": {
+    "source_path": "/mnt/d/Project_and_Assignment/AI_project/data_cvt/CO2039_Advanced_Programming/Syllabus/slide_003.png",
+    "course": "Advanced_Programming",
+    "engine": "paddleocr"
+  },
+  "items": [
+    {
+      "text": "1/7/25, 7:40 AM",
+      "score": 0.9988697171211243,
+      "polygon": [
+        [
+          72.0,
+          45.0
+        ],
+        [
+          238.0,
+          45.0
+        ],
+        [
+          238.0,
+          72.0
+        ],
+        [
+          72.0,
+          72.0
+        ]
+      ]
+    },
+    {
+      "text": "DCMH.CO2039_Advanced Programming",
+      "score": 0.9858649969100952,
+      "polygon": [
+        [
+          828.0,
+          45.0
+        ],
+        [
+          1243.0,
+          47.0
+        ],
+        [
+          1243.0,
+          74.0
+        ],
+        [
+          828.0,
+          72.0
+        ]
+      ]
+    },
+    {
+      "text": "HO CHI MINH CITY UNIVERSITY OF TECHNOLOGY",
+      "score": 0.9812988638877869,
+      "polygon": [
+        [
+          305.0,
+          121.0
+        ],
+        [
+          925.0,
+          121.0
+        ],
+        [
+          925.0,
+          145.0
+        ],
+        [
+          305.0,
+          145.0
+        ]
+      ]
+    },
+    {
+      "text": "BK",
+      "score": 0.9988679885864258,
+      "polygon": [
+        [
+          143.0,
+          133.0
+        ],
+        [
+          198.0,
+          133.0
+        ],
+        [
+          198.0,
+          168.0
+        ],
+        [
+          143.0,
+          168.0
+        ]
+      ]
+    },
+    {
+      "text": "TRUONG DAI HQC BÁCH KHOA - DHQG-HCM",
+      "score": 0.9743661284446716,
+      "polygon": [
+        [
+          340.0,
+          144.0
+        ],
+        [
+          890.0,
+          147.0
+        ],
+        [
+          890.0,
+          177.0
+        ],
+        [
+          340.0,
+          174.0
+        ]
+      ]
+    },
+    {
+      "text": "TP.HCM",
+      "score": 0.9996716380119324,
+      "polygon": [
+        [
+          145.0,
+          163.0
+        ],
+        [
+          195.0,
+          163.0
+        ],
+        [
+          195.0,
+          179.0
+        ],
+        [
+          145.0,
+          179.0
+        ]
+      ]
+    },
+    {
+      "text": "DCMH.C02039.1.1",
+      "score": 0.998133659362793,
+      "polygon": [
+        [
+          1325.0,
+          162.0
+        ],
+        [
+          1567.0,
+          162.0
+        ],
+        [
+          1567.0,
+          186.0
+        ],
+        [
+          1325.0,
+          186.0
+        ]
+      ]
+    },
+    {
+      "text": "Haskell. Thông qua vic thuc hành 1 s úng dung don giàn dê hièu sâu sâc vê các tính cht chnh yêu cûa mô hình",
+      "score": 0.9334864616394043,
+      "polygon": [
+        [
+          143.0,
+          238.0
+        ],
+        [
+          1728.0,
+          238.0
+        ],
+        [
+          1728.0,
+          272.0
+        ],
+        [
+          143.0,
+          272.0
+        ]
+      ]
+    },
+    {
+      "text": "huóng dôi tung cng nhu lâp trình huóng chúc nng.",
+      "score": 0.9646535515785217,
+      "polygon": [
+        [
+          143.0,
+          275.0
+        ],
+        [
+          874.0,
+          277.0
+        ],
+        [
+          874.0,
+          312.0
+        ],
+        [
+          142.0,
+          310.0
+        ]
+      ]
+    },
+    {
+      "text": "This course provides essential knowledge about object-oriented model and the level of support for object-oriented",
+      "score": 0.9874594807624817,
+      "polygon": [
+        [
+          143.0,
+          346.0
+        ],
+        [
+          1730.0,
+          347.0
+        ],
+        [
+          1730.0,
+          380.0
+        ],
+        [
+          143.0,
+          379.0
+        ]
+      ]
+    },
+    {
+      "text": "model of some popular languages such as C++, Java and ability to create some applications using functional",
+      "score": 0.9829314351081848,
+      "polygon": [
+        [
+          142.0,
+          384.0
+        ],
+        [
+          1730.0,
+          383.0
+        ],
+        [
+          1730.0,
+          416.0
+        ],
+        [
+          142.0,
+          417.0
+        ]
+      ]
+    },
+    {
+      "text": "programming language such as Haskell. It helps to understand the main features of object-oriented model through",
+      "score": 0.9894985556602478,
+      "polygon": [
+        [
+          142.0,
+          422.0
+        ],
+        [
+          1728.0,
+          420.0
+        ],
+        [
+          1728.0,
+          454.0
+        ],
+        [
+          142.0,
+          456.0
+        ]
+      ]
+    },
+    {
+      "text": "implementing some simple applications as well as functional programming.",
+      "score": 0.993200421333313,
+      "polygon": [
+        [
+          144.0,
+          457.0
+        ],
+        [
+          1142.0,
+          460.0
+        ],
+        [
+          1142.0,
+          494.0
+        ],
+        [
+          143.0,
+          490.0
+        ]
+      ]
+    },
+    {
+      "text": "4.2. Chuân d'â ra hoc ph n (Course learning outcomes)",
+      "score": 0.9432591199874878,
+      "polygon": [
+        [
+          103.0,
+          493.0
+        ],
+        [
+          886.0,
+          497.0
+        ],
+        [
+          886.0,
+          528.0
+        ],
+        [
+          103.0,
+          525.0
+        ]
+      ]
+    },
+    {
+      "text": "CDIO",
+      "score": 0.9894789457321167,
+      "polygon": [
+        [
+          101.0,
+          535.0
+        ],
+        [
+          193.0,
+          535.0
+        ],
+        [
+          193.0,
+          571.0
+        ],
+        [
+          101.0,
+          571.0
+        ]
+      ]
+    },
+    {
+      "text": "L.O.1 - Trình bày duc các kin thúrc thiêt yu v mô hình huóng dôi tung nhu class,object, bao dóng, thùa kê,",
+      "score": 0.9540637135505676,
+      "polygon": [
+        [
+          183.0,
+          619.0
+        ],
+        [
+          1729.0,
+          621.0
+        ],
+        [
+          1729.0,
+          654.0
+        ],
+        [
+          183.0,
+          652.0
+        ]
+      ]
+    },
+    {
+      "text": "bao gp, gòi thông dip, da xa, tông quát hóa, Các mu thiêt kê co bân... cng nhu các kiên thúrc co bân liên quan",
+      "score": 0.9465159773826599,
+      "polygon": [
+        [
+          185.0,
+          670.0
+        ],
+        [
+          1726.0,
+          670.0
+        ],
+        [
+          1726.0,
+          704.0
+        ],
+        [
+          185.0,
+          704.0
+        ]
+      ]
+    },
+    {
+      "text": "dn lp trình huóng chúc nng (FP)",
+      "score": 0.9639180302619934,
+      "polygon": [
+        [
+          186.0,
+          721.0
+        ],
+        [
+          663.0,
+          721.0
+        ],
+        [
+          663.0,
+          752.0
+        ],
+        [
+          186.0,
+          752.0
+        ]
+      ]
+    },
+    {
+      "text": "(Present the fundamental knowledges of object-oriented model such as class, object closure, inheritance,",
+      "score": 0.9887707233428955,
+      "polygon": [
+        [
+          314.0,
+          768.0
+        ],
+        [
+          1728.0,
+          770.0
+        ],
+        [
+          1728.0,
+          803.0
+        ],
+        [
+          314.0,
+          801.0
+        ]
+      ]
+    },
+    {
+      "text": "inclusion, sending messages, polymophism, generalization, design patterns as well as basic knowledges related to",
+      "score": 0.982295572757721,
+      "polygon": [
+        [
+          186.0,
+          820.0
+        ],
+        [
+          1726.0,
+          819.0
+        ],
+        [
+          1726.0,
+          850.0
+        ],
+        [
+          186.0,
+          851.0
+        ]
+      ]
+    },
+    {
+      "text": "functional programming (FP))",
+      "score": 0.9983624219894409,
+      "polygon": [
+        [
+          182.0,
+          870.0
+        ],
+        [
+          590.0,
+          870.0
+        ],
+        [
+          590.0,
+          901.0
+        ],
+        [
+          182.0,
+          901.0
+        ]
+      ]
+    },
+    {
+      "text": "L.O.1.1 - Trình bày duc tính bao dóng, thùa kê, da xa",
+      "score": 0.974292516708374,
+      "polygon": [
+        [
+          267.0,
+          919.0
+        ],
+        [
+          997.0,
+          919.0
+        ],
+        [
+          997.0,
+          949.0
+        ],
+        [
+          267.0,
+          949.0
+        ]
+      ]
+    },
+    {
+      "text": "(Understand knowledges of closure, inheritance, polymorphims)",
+      "score": 0.9973349571228027,
+      "polygon": [
+        [
+          366.0,
+          967.0
+        ],
+        [
+          1215.0,
+          968.0
+        ],
+        [
+          1215.0,
+          999.0
+        ],
+        [
+          366.0,
+          998.0
+        ]
+      ]
+    },
+    {
+      "text": "L.O.1.2 - Nám duoc khái nim pure funtion",
+      "score": 0.9846988916397095,
+      "polygon": [
+        [
+          266.0,
+          1013.0
+        ],
+        [
+          848.0,
+          1016.0
+        ],
+        [
+          848.0,
+          1047.0
+        ],
+        [
+          266.0,
+          1044.0
+        ]
+      ]
+    },
+    {
+      "text": "(Understand knowledge of pure functions)",
+      "score": 0.9885110855102539,
+      "polygon": [
+        [
+          367.0,
+          1065.0
+        ],
+        [
+          923.0,
+          1066.0
+        ],
+        [
+          923.0,
+          1098.0
+        ],
+        [
+          367.0,
+          1097.0
+        ]
+      ]
+    },
+    {
+      "text": "L.O.1.3 - Su khác nhau gia OOP và FP",
+      "score": 0.9924275875091553,
+      "polygon": [
+        [
+          266.0,
+          1114.0
+        ],
+        [
+          802.0,
+          1114.0
+        ],
+        [
+          802.0,
+          1147.0
+        ],
+        [
+          266.0,
+          1147.0
+        ]
+      ]
+    },
+    {
+      "text": "(The differences between OOP and FP)",
+      "score": 0.9976446628570557,
+      "polygon": [
+        [
+          367.0,
+          1164.0
+        ],
+        [
+          889.0,
+          1164.0
+        ],
+        [
+          889.0,
+          1197.0
+        ],
+        [
+          367.0,
+          1197.0
+        ]
+      ]
+    },
+    {
+      "text": "L.O.2 - Có khå nng lp trình bng mt s ngôn ng OOP nhu Java, C++ d giâi quyt các bài toán OOP don giân.",
+      "score": 0.955959677696228,
+      "polygon": [
+        [
+          184.0,
+          1212.0
+        ],
+        [
+          1708.0,
+          1212.0
+        ],
+        [
+          1708.0,
+          1245.0
+        ],
+        [
+          184.0,
+          1245.0
+        ]
+      ]
+    },
+    {
+      "text": "(Ability in programming using some OOP languages such as Java, C ++ to solve simple problems.)",
+      "score": 0.9855167269706726,
+      "polygon": [
+        [
+          283.0,
+          1261.0
+        ],
+        [
+          1600.0,
+          1262.0
+        ],
+        [
+          1600.0,
+          1297.0
+        ],
+        [
+          283.0,
+          1296.0
+        ]
+      ]
+    },
+    {
+      "text": "L.O.2.1 - Thiêt kê mt chuong trình bng các lóp theo ky thut OOP",
+      "score": 0.9657384157180786,
+      "polygon": [
+        [
+          266.0,
+          1311.0
+        ],
+        [
+          1184.0,
+          1311.0
+        ],
+        [
+          1184.0,
+          1344.0
+        ],
+        [
+          266.0,
+          1344.0
+        ]
+      ]
+    },
+    {
+      "text": "(Design a program using OOP classes)",
+      "score": 0.9882345199584961,
+      "polygon": [
+        [
+          366.0,
+          1361.0
+        ],
+        [
+          887.0,
+          1361.0
+        ],
+        [
+          887.0,
+          1394.0
+        ],
+        [
+          366.0,
+          1394.0
+        ]
+      ]
+    },
+    {
+      "text": "L.O.2.2 - Hin thuc mt chuong trình OOP tù bân thiêt kê dúng chun",
+      "score": 0.960317850112915,
+      "polygon": [
+        [
+          266.0,
+          1410.0
+        ],
+        [
+          1204.0,
+          1410.0
+        ],
+        [
+          1204.0,
+          1443.0
+        ],
+        [
+          266.0,
+          1443.0
+        ]
+      ]
+    },
+    {
+      "text": "(Implement an OOP program from a proper design)",
+      "score": 0.995551347732544,
+      "polygon": [
+        [
+          366.0,
+          1460.0
+        ],
+        [
+          1054.0,
+          1460.0
+        ],
+        [
+          1054.0,
+          1494.0
+        ],
+        [
+          366.0,
+          1494.0
+        ]
+      ]
+    },
+    {
+      "text": "L.O.3 - Có khå nng lp trình bng mt s ngôn ng huóng chúrc nng nhu Python hoc Haskell d giâi quyêt các",
+      "score": 0.9547722339630127,
+      "polygon": [
+        [
+          183.0,
+          1507.0
+        ],
+        [
+          1726.0,
+          1508.0
+        ],
+        [
+          1726.0,
+          1542.0
+        ],
+        [
+          183.0,
+          1541.0
+        ]
+      ]
+    },
+    {
+      "text": "bài toán lp trình hàm don giàn.",
+      "score": 0.9702734351158142,
+      "polygon": [
+        [
+          186.0,
+          1560.0
+        ],
+        [
+          611.0,
+          1560.0
+        ],
+        [
+          611.0,
+          1591.0
+        ],
+        [
+          186.0,
+          1591.0
+        ]
+      ]
+    },
+    {
+      "text": "(Ability in programming using some FP languages such as Haskell to solve simple problems.)",
+      "score": 0.9914600849151611,
+      "polygon": [
+        [
+          285.0,
+          1608.0
+        ],
+        [
+          1519.0,
+          1608.0
+        ],
+        [
+          1519.0,
+          1642.0
+        ],
+        [
+          285.0,
+          1642.0
+        ]
+      ]
+    },
+    {
+      "text": "L.O.3.1 - Thiêt kê mt chuong trình bng các pure function",
+      "score": 0.9697977900505066,
+      "polygon": [
+        [
+          266.0,
+          1655.0
+        ],
+        [
+          1060.0,
+          1655.0
+        ],
+        [
+          1060.0,
+          1690.0
+        ],
+        [
+          266.0,
+          1690.0
+        ]
+      ]
+    },
+    {
+      "text": "(Design a program using pure functions)",
+      "score": 0.9961775541305542,
+      "polygon": [
+        [
+          365.0,
+          1706.0
+        ],
+        [
+          907.0,
+          1707.0
+        ],
+        [
+          907.0,
+          1741.0
+        ],
+        [
+          365.0,
+          1740.0
+        ]
+      ]
+    },
+    {
+      "text": "L.O.3.2 - Hin thuc duc chuong trình theo huóng chúrc nng tù bån thit kê",
+      "score": 0.9499610662460327,
+      "polygon": [
+        [
+          265.0,
+          1755.0
+        ],
+        [
+          1299.0,
+          1754.0
+        ],
+        [
+          1299.0,
+          1787.0
+        ],
+        [
+          265.0,
+          1788.0
+        ]
+      ]
+    },
+    {
+      "text": "(Implement an FP program from the design)",
+      "score": 0.989105761051178,
+      "polygon": [
+        [
+          365.0,
+          1803.0
+        ],
+        [
+          952.0,
+          1804.0
+        ],
+        [
+          952.0,
+          1839.0
+        ],
+        [
+          365.0,
+          1838.0
+        ]
+      ]
+    },
+    {
+      "text": "L.O.4 - Nâm duc mt s khuynh huóng mói trong lâp trình",
+      "score": 0.9697228670120239,
+      "polygon": [
+        [
+          183.0,
+          1849.0
+        ],
+        [
+          995.0,
+          1853.0
+        ],
+        [
+          995.0,
+          1890.0
+        ],
+        [
+          182.0,
+          1885.0
+        ]
+      ]
+    },
+    {
+      "text": "(Understand some new programming approaches)",
+      "score": 0.999668300151825,
+      "polygon": [
+        [
+          283.0,
+          1903.0
+        ],
+        [
+          949.0,
+          1904.0
+        ],
+        [
+          949.0,
+          1938.0
+        ],
+        [
+          283.0,
+          1937.0
+        ]
+      ]
+    },
+    {
+      "text": "L.O.4.1 - Hièu duc Lâp trình sâp xêp du liu",
+      "score": 0.9384233951568604,
+      "polygon": [
+        [
+          265.0,
+          1950.0
+        ],
+        [
+          877.0,
+          1951.0
+        ],
+        [
+          877.0,
+          1985.0
+        ],
+        [
+          265.0,
+          1984.0
+        ]
+      ]
+    },
+    {
+      "text": "(Data wrangling)",
+      "score": 0.996051549911499,
+      "polygon": [
+        [
+          364.0,
+          2001.0
+        ],
+        [
+          602.0,
+          2001.0
+        ],
+        [
+          602.0,
+          2038.0
+        ],
+        [
+          364.0,
+          2038.0
+        ]
+      ]
+    },
+    {
+      "text": "L.O.4.2 - Hiéu duc Lâp trình các hop d ng thông minh",
+      "score": 0.9660953879356384,
+      "polygon": [
+        [
+          264.0,
+          2049.0
+        ],
+        [
+          1019.0,
+          2051.0
+        ],
+        [
+          1019.0,
+          2086.0
+        ],
+        [
+          264.0,
+          2083.0
+        ]
+      ]
+    },
+    {
+      "text": "(Smart contracts )",
+      "score": 0.9741714000701904,
+      "polygon": [
+        [
+          365.0,
+          2100.0
+        ],
+        [
+          602.0,
+          2100.0
+        ],
+        [
+          602.0,
+          2134.0
+        ],
+        [
+          365.0,
+          2134.0
+        ]
+      ]
+    },
+    {
+      "text": "L.O.4.3 - Nám duc IDE phù hop dé lâp trình FP",
+      "score": 0.950323760509491,
+      "polygon": [
+        [
+          265.0,
+          2147.0
+        ],
+        [
+          925.0,
+          2150.0
+        ],
+        [
+          925.0,
+          2184.0
+        ],
+        [
+          265.0,
+          2181.0
+        ]
+      ]
+    },
+    {
+      "text": "(Use IDEs to programing FP programs)",
+      "score": 0.9878662824630737,
+      "polygon": [
+        [
+          366.0,
+          2200.0
+        ],
+        [
+          898.0,
+          2200.0
+        ],
+        [
+          898.0,
+          2233.0
+        ],
+        [
+          366.0,
+          2233.0
+        ]
+      ]
+    },
+    {
+      "text": "268 L Thuòng Kit, Phuòng 14, Qun 10, TP.HCM",
+      "score": 0.9825904369354248,
+      "polygon": [
+        [
+          105.0,
+          2424.0
+        ],
+        [
+          633.0,
+          2424.0
+        ],
+        [
+          633.0,
+          2451.0
+        ],
+        [
+          105.0,
+          2451.0
+        ]
+      ]
+    },
+    {
+      "text": "268 Ly Thuong Kiet St., Ward 14, Dist. 10, Ho Chi Minh City, Vietnam",
+      "score": 0.9770262241363525,
+      "polygon": [
+        [
+          1030.0,
+          2423.0
+        ],
+        [
+          1728.0,
+          2424.0
+        ],
+        [
+          1728.0,
+          2451.0
+        ],
+        [
+          1030.0,
+          2450.0
+        ]
+      ]
+    },
+    {
+      "text": "Din thoai: 028 3864 7256. www.hcmut.edu.vn",
+      "score": 0.9986042976379395,
+      "polygon": [
+        [
+          105.0,
+          2453.0
+        ],
+        [
+          576.0,
+          2454.0
+        ],
+        [
+          576.0,
+          2479.0
+        ],
+        [
+          105.0,
+          2478.0
+        ]
+      ]
+    },
+    {
+      "text": "Phone: 028 3864 7256. www.hcmut.edu.vn",
+      "score": 0.9843654632568359,
+      "polygon": [
+        [
+          1302.0,
+          2453.0
+        ],
+        [
+          1727.0,
+          2454.0
+        ],
+        [
+          1727.0,
+          2479.0
+        ],
+        [
+          1302.0,
+          2478.0
+        ]
+      ]
+    },
+    {
+      "text": "about:blank",
+      "score": 0.9994514584541321,
+      "polygon": [
+        [
+          71.0,
+          2500.0
+        ],
+        [
+          190.0,
+          2500.0
+        ],
+        [
+          190.0,
+          2524.0
+        ],
+        [
+          71.0,
+          2524.0
+        ]
+      ]
+    },
+    {
+      "text": "3/8",
+      "score": 0.9999043941497803,
+      "polygon": [
+        [
+          1707.0,
+          2495.0
+        ],
+        [
+          1750.0,
+          2495.0
+        ],
+        [
+          1750.0,
+          2528.0
+        ],
+        [
+          1707.0,
+          2528.0
+        ]
+      ]
+    }
+  ]
+}

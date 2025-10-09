@@ -117,8 +117,6 @@ def parse_number(
 ) -> Optional[Tuple[NumKind, Union[int, float]]]:
     if text is None:
         return None
-
-    # Trường hợp đã là số
     if isinstance(text, bool):
         return None
     if isinstance(text, int):

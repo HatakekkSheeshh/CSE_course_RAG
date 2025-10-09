@@ -1,24 +1,13 @@
-10:06, 04/09/2022
-DCMH.CO3085_Natural Language Processing
+1/7/25, 7:40 AM
+DCMH.CO2039_Advanced Programming
 HO CHI MINH CITY UNIVERSITY OF TECHNOLOGY
 BK
-TRUÖNG DAI HQC BÁCH KHOA - DHQG-HCM
+TRUONG DAI HQC BÁCH KHOA - DHQG-HCM
 TP.HCM
-DCMH.C03085.3.1
-tam
-tam
-Tp.Hò Chí Minh, ngày 4 tháng 9 nm 2022
-HCM City, September 4 2022
-TRUONG KHOA
-CHU NHIÉM BQ MÔN
-CB PHU TRÁCH LÄP DÊ CUONG
-(Dean)
-(Head of Department)
-(Lecturer in-charge)
+DCMH.C02039.1.1
 268 L Thuòng Kit, Phuòng 14, Qun 10, TP.HCM
 268 Ly Thuong Kiet St., Ward 14, Dist. 10, Ho Chi Minh City, Vietnam
-Din thoai: 028 3864 7256
-Phone: 028 3864 7256
-www.hcmut.edu.vn
-www.hcmut.edu.vn
-12/12
+Din thoai: 028 3864 7256. www.hcmut.edu.vn
+Phone: 028 3864 7256. www.hcmut.edu.vn
+about:blank
+8/8

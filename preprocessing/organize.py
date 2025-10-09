@@ -1,15 +1,21 @@
+"""
+Store OCR outputs into the normalized syllabus layout:
+
+    data/<course>/syllabus/
+    - ocr_json/<stem>.ocr.json
+    - text/<stem>.txt                  (if plain_text provided)
+    - images/<original-name>           (if copy_source_image=True)
+    - annotated/<name>                 (if annotated_image is provided)
+
+Returns a dict with the saved paths (as strings).
+"""
+
 from __future__ import annotations
 from pathlib import Path
 import shutil
 import json
 from typing import Optional, Dict, Any
 from .pathing import ensure_layout_for_source, update_manifest
-
-"""
-    Ensure 
-    Return the dict of key and value is the path_name of each file
-
-"""
 
 def _unique_path(target_dir: Path, filename: str) -> Path:
     """
@@ -38,17 +44,7 @@ def save_ocr_result(
     data_cvt_root: Path = Path("data_cvt"),
     extra_meta: Optional[Dict[str, Any]] = None,
 ) -> Dict[str, str]:
-    """
-    Store OCR outputs into the normalized syllabus layout:
 
-      data/<course>/syllabus/
-        - ocr_json/<stem>.ocr.json
-        - text/<stem>.txt                  (if plain_text provided)
-        - images/<original-name>           (if copy_source_image=True)
-        - annotated/<name>                 (if annotated_image is provided)
-
-    Returns a dict with the saved paths (as strings).
-    """
     src_file = Path(src_file)
     layout = ensure_layout_for_source(
         src_file, data_root=data_root, data_cvt_root=data_cvt_root

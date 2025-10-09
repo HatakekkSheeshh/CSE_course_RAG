@@ -11,8 +11,6 @@ from preprocessing.extract_syllabus import extract_syllabus
 from preprocessing.organize import save_ocr_result
 from preprocessing.pathing import extract_course_name
 
-from preprocessing.overlay import write_svg_overlay
-
 ROOT = Path(__file__).resolve().parent
 
 
@@ -76,41 +74,66 @@ def main(do_convert: bool = False):
             max_workers=3,
         )
 
+    # 2) Collect images grouped by course
+    images_by_course = collect_syllabus_images_by_course(ROOT)
+    if not images_by_course:
+        print("No Syllabus images found under data_cvt/<COURSE_DIR>/Syllabus/. Nothing to do.")
+        return
+
+    # 3) Initialize OCR detector once
     print("Detecting (OCR)...")
-    out_dir = ROOT / "test"  # For debug outputs (JSON, annotated.png)
+    out_dir = ROOT / "scratch"  # For debug outputs (JSON, annotated.png)
     # out_dir = None
     detector = OCRTextDetector(out_dir=str(out_dir))  
 
-    img_path = ROOT / "data_cvt" / "CO1005_Introduction_to_Computing" / "Syllabus" / "slide_001.png"
+    
+    course_dir = ROOT / "data_cvt" / "CO2039_Advanced_Programming"
+    course_name = extract_course_name(course_dir.name)
+    images = images_by_course[course_dir]
+    processed = 0
+    for img_path in images:
+        print(f"--- Processing image: {img_path.name}")
+        if not img_path.exists():
+            continue
 
-    print(f"--- Processing image: {img_path.name}")
-    items = detector.run(str(img_path))
-    plain_text = " ".join([it.get("text", "") for it in items if it.get("text")])
-    syllabus = extract_syllabus(items)
-    out_paths, layout = save_ocr_result(
-        src_file=img_path,
-        items=items,
-        plain_text=plain_text,
-        annotated_image=ROOT / "scratch" / "annotated.png",                   # pass a path or PIL image if rendering bboxes is necessary
-        copy_source_image=True,                 # set True to copy originals into images/
-        data_root=ROOT / "test",
-        data_cvt_root=ROOT / "data_cvt",
-        extra_meta={"engine": "paddleocr"},
-    )
-    overlay_svg = write_svg_overlay(img_path, items, layout.annotated)
-    print(f"     ANNOTATED: {overlay_svg}")
+        # 3.1) OCR -> items
+        # The annoted.png can be captured from items, do it latter ...
+        items = detector.run(str(img_path))
+        plain_text = " ".join([it.get("text", "") for it in items if it.get("text")])
 
-    parsed_dir = layout.syllabus_root / "parsed"
-    parsed_dir.mkdir(parents=True, exist_ok=True)
-    parsed_json = parsed_dir / f"{img_path.stem}.syllabus.json"
-    parsed_json.write_text(json.dumps(asdict(syllabus), ensure_ascii=False, indent=2), encoding="utf-8")
+        # 3.2) Extract structured syllabus (your existing logic)
+        syllabus = extract_syllabus(items)
 
-    print(f"[OK] {img_path.name}")
-    print(f"     OCR JSON  : {out_paths['json']}")
-    if out_paths['text']:
-        print(f"     TEXT      : {out_paths['text']}")
-    print(f"     PARSED    : {parsed_json}")
-    print("\n")
+        # 3.3) Persist outputs in normalized layout:
+        #      data/<course>/syllabus/{ocr_json,text,images?,annotated?}
+        out_paths, layout = save_ocr_result(
+            src_file=img_path,
+            items=items,
+            plain_text=plain_text,
+            annotated_image=ROOT / "scratch" / "annotated.png",       # pass a path or PIL image if rendering bboxes is necessary
+            copy_source_image=True,                                 
+            data_root=ROOT / "test_advance_programming", # Out path root
+            data_cvt_root=ROOT / "data_cvt",
+            extra_meta={"engine": "paddleocr"},
+        )
+
+        # 3.4) Save extracted syllabus JSON under .../syllabus/parsed
+        parsed_dir = layout.syllabus_root / "parsed"
+        parsed_dir.mkdir(parents=True, exist_ok=True)
+        parsed_json = parsed_dir / f"{img_path.stem}.syllabus.json"
+        parsed_json.write_text(json.dumps(asdict(syllabus), ensure_ascii=False, indent=2), encoding="utf-8")
+
+        print(f"[OK] {img_path.name}")
+        print(f"     OCR JSON  : {out_paths['json']}")
+        if out_paths['text']:
+            print(f"     TEXT      : {out_paths['text']}")
+        print(f"     PARSED    : {parsed_json}")
+        print("\n")
+
+    
+        processed += 1
+
+        print(f"--- Done course: {course_name} | images processed: {processed}")
 
     print(f"\nAll done.")
 

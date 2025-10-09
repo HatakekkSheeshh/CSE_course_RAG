@@ -1,126 +1,49 @@
+# --- Data Domain (Syllabus) - v1 ---
+
 from dataclasses import dataclass, field
-from typing import List, Optional, Literal, Dict, Tuple
+from typing import List, Optional, Literal
 
-# --- OCR/Layout ---
-BBox = Tuple[float, float, float, float]    # x1,y1,x2,y2
-Polygon = List[Tuple[float, float]]         # (x1,y1) (x1, y2) (x2, y1) (x2, y2)
+# Metadata đi kèm để embed/tracking
+@dataclass
+class Metadata:
+    doc_type: Literal["syllabus"] = "syllabus"
+    course_id: str = ""                       # "CO1005"
+    source_file: Optional[str] = None         # "path/to/image_or_pdf#page=1"
+    page_index: int = 0
+    language: str = "en"
+    ocr_engine: Optional[str] = None          # "PaddleOCR 2.7"
+    extractor_version: Optional[str] = None   # "1.0.0"
+    timestamp: Optional[str] = None           # ISO8601
 
 @dataclass
-class OCRItem:
-    text: str
-    score: float
-    polygon: Polygon
-    page: int
-
-@dataclass
-class Block:
-    kind: Literal["title","heading","kv","paragraph","table","list","footer"]
-    items: List[OCRItem]
-    bbox: BBox
-    page: int
-
-@dataclass
-class Page:
-    index: int
-    blocks: List[Block] = field(default_factory=list)
-    image_path: Optional[str] = None
-
-@dataclass
-class Document:
-    doc_id: str
-    file_name: str
-    pages: List[Page]
-    source_meta: Dict[str,str] = field(default_factory=dict)    # course, faculty,...
-
-""" --- Data Domain (Syllabus) --- """
-@dataclass
-# Slide 1st
 class CourseInfo:
-    title: Optional[str]                                        # Course title: Mathematical Modeling
-    course_id: Optional[str]                                    # CO2011    
-    credits: Optional[int]                                      # 3
-    applied_semester: Optional[str]                             # 20211
-    course_format: Dict[str, float]                             # {"Lecture_hours":30, "Lab_hours":20, ...}
+    title: Optional[str] = None               # "Introduction to Computing"
+    course_id: Optional[str] = None           # "CO1005"
+    credits: Optional[int] = None             # 3
+    applied_semester: Optional[str] = None    # "20231", "HK202", ...
 
     @property
-    def etcs(self):
-        return credits * 2
+    def ects(self) -> Optional[int]:
+        return self.credits * 2 if self.credits is not None else None
 
 @dataclass
 class AssessmentComponent:
-    name: str                                                   # Midterm, Final, Project, Lab...
-    ratio: float                                                # 20%, 40%...
-    format: Optional[str]                                       # MCQ, written, practice...
-    duration_min: Optional[int]                                 # 70, 80 minutes
-
-# Slide 2nd
-@dataclass
-class Prerequisite:
-    course_id: Optional[str]
-    course_title: Optional[str]
-    kind: Literal["Prereq","Coreq","Recommended","None"] = "None"
+    name: str                                 # "labs_practices" | "projects" | "midterm_exam" | "final_exam" | "total" | ...
+    ratio: Optional[int] = None               # 0..100
+    format: Optional[str] = None              # "MCQ", "Constructed response", "--", ...
+    duration_min: Optional[int] = None        # minutes | None
 
 @dataclass
-class UnitInCharge:
-    department: Optional[str]
-    office: Optional[str]
-    phone: Optional[str]
-    lecturer: Optional[str]
-    email: Optional[str]
+class Prerequisites:
+    recommended: List[str] = field(default_factory=list)   # HT/KN
+    prereq: List[str] = field(default_factory=list)        # TQ
+    coreq: List[str] = field(default_factory=list)         # SH
 
 @dataclass
-class Material:
-    title: str
-    authors: Optional[str] = None
-    edition: Optional[str] = None
-    year: Optional[str] = None
-    type: Literal["textbook","reference"] = "textbook"
-
-@dataclass
-class LearningOutcomeItem:
-    code: str                                                   # e.g., "LO.2.3"
-    vi: Optional[str]
-    en: Optional[str]
-    mapped_assessment: List[str]                                # e.g., ["Midterm","Final","Large assignment"]
-
-@dataclass
-class TeachingMethod:
-    name: str                                                   # blended, lecture, practice...
-    notes: Optional[str]=None
-
-@dataclass
-class SessionPlan:
-    session_no: int
-    topics: List[str]
-    learning_outcomes: List[str]                                # references to LO codes
-    activities: List[str]                                       # lecturer/student activities
-
-@dataclass
-class StudyGuideline:
-    notes: Optional[str]
-
-@dataclass
-class EditingInfo:
-    edited_semester: Optional[str]
-    version: Optional[str]
-    last_change: Optional[str]
-
-@dataclass
-class Syllabus:
-    # Slide 1st
-    course_info: CourseInfo
-    assessments: List[AssessmentComponent]
-
-    """
-    prerequisites: List[Prerequisite]
-    knowledge_block: Optional[str]                              # Foundation/Major/...
-    unit_in_charge: Optional[UnitInCharge]
-    materials: List[Material]
-    learning_outcomes: List[LearningOutcomeItem]
-    teaching_methods: List[TeachingMethod]
-    session_plan: List[SessionPlan]
-    study_guidelines: Optional[StudyGuideline]
-    other_requirements: Optional[str]
-    editing_info: Optional[EditingInfo]
-    anchors: Dict[str, Polygon] = field(default_factory=dict)   # heading polygons for traceability
-    """
+class SyllabusV1:
+    schema_version: Literal["syllabus.v1"] = "syllabus.v1"
+    metadata: Metadata = field(default_factory=Metadata)
+    course_info: CourseInfo = field(default_factory=CourseInfo)
+    assessments: List[AssessmentComponent] = field(default_factory=list)
+    prerequisites: Prerequisites = field(default_factory=Prerequisites)
+    raw_ocr_text: Optional[str] = None

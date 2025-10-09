@@ -10,3 +10,5 @@ opencv-python>=4.10
 rapidfuzz>=3.9
 tiktoken>=0.7
 matplotlib
+
+faiss-cpu

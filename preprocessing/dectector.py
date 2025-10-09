@@ -1,3 +1,10 @@
+"""
+OCR wrapper for PaddleOCR 3.2.0
+- predict -> OCRResult dict-like
+- standardize to List[Dict]: [{ "text": str, "score": float, "polygon": [[x,y],... (4 points)] }]
+- save to json/txt/annotated image
+"""
+
 from __future__ import annotations
 from pathlib import Path
 from typing import List, Dict, Optional
@@ -16,7 +23,7 @@ class OCRTextDetector:
     ):
         """
         Wrapper for PaddleOCR 3.2.0 (predict -> OCRResult dict-like).
-        - lang: "en", "vi", "latin", ...
+        - lang: "en"
         - score_thr: threshold for filtering results
         - out_dir: export folder for json/txt/ảnh annotate
         - use_preproc: preprocessor (bilateral + gray)
@@ -28,6 +35,7 @@ class OCRTextDetector:
             use_textline_orientation = False,
             use_doc_orientation_classify = False,
             use_doc_unwarping = False,
+            ocr_version="PP-OCRv3",
             **ocr_kwargs
         )
         self.score_thr = float(score_thr)

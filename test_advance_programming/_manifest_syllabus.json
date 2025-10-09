@@ -1,0 +1,66 @@
+[
+  {
+    "course": "Advanced_Programming",
+    "source_path": "/mnt/d/Project_and_Assignment/AI_project/data_cvt/CO2039_Advanced_Programming/Syllabus/slide_001.png",
+    "dest_json": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/ocr_json/slide_001.ocr.json",
+    "dest_text": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/text/slide_001.txt",
+    "dest_image": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/images/slide_001.png",
+    "dest_annotated": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/annotated/annotated.png"
+  },
+  {
+    "course": "Advanced_Programming",
+    "source_path": "/mnt/d/Project_and_Assignment/AI_project/data_cvt/CO2039_Advanced_Programming/Syllabus/slide_002.png",
+    "dest_json": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/ocr_json/slide_002.ocr.json",
+    "dest_text": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/text/slide_002.txt",
+    "dest_image": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/images/slide_002.png",
+    "dest_annotated": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/annotated/annotated__1.png"
+  },
+  {
+    "course": "Advanced_Programming",
+    "source_path": "/mnt/d/Project_and_Assignment/AI_project/data_cvt/CO2039_Advanced_Programming/Syllabus/slide_003.png",
+    "dest_json": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/ocr_json/slide_003.ocr.json",
+    "dest_text": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/text/slide_003.txt",
+    "dest_image": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/images/slide_003.png",
+    "dest_annotated": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/annotated/annotated__2.png"
+  },
+  {
+    "course": "Advanced_Programming",
+    "source_path": "/mnt/d/Project_and_Assignment/AI_project/data_cvt/CO2039_Advanced_Programming/Syllabus/slide_004.png",
+    "dest_json": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/ocr_json/slide_004.ocr.json",
+    "dest_text": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/text/slide_004.txt",
+    "dest_image": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/images/slide_004.png",
+    "dest_annotated": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/annotated/annotated__3.png"
+  },
+  {
+    "course": "Advanced_Programming",
+    "source_path": "/mnt/d/Project_and_Assignment/AI_project/data_cvt/CO2039_Advanced_Programming/Syllabus/slide_005.png",
+    "dest_json": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/ocr_json/slide_005.ocr.json",
+    "dest_text": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/text/slide_005.txt",
+    "dest_image": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/images/slide_005.png",
+    "dest_annotated": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/annotated/annotated__4.png"
+  },
+  {
+    "course": "Advanced_Programming",
+    "source_path": "/mnt/d/Project_and_Assignment/AI_project/data_cvt/CO2039_Advanced_Programming/Syllabus/slide_006.png",
+    "dest_json": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/ocr_json/slide_006.ocr.json",
+    "dest_text": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/text/slide_006.txt",
+    "dest_image": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/images/slide_006.png",
+    "dest_annotated": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/annotated/annotated__5.png"
+  },
+  {
+    "course": "Advanced_Programming",
+    "source_path": "/mnt/d/Project_and_Assignment/AI_project/data_cvt/CO2039_Advanced_Programming/Syllabus/slide_007.png",
+    "dest_json": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/ocr_json/slide_007.ocr.json",
+    "dest_text": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/text/slide_007.txt",
+    "dest_image": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/images/slide_007.png",
+    "dest_annotated": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/annotated/annotated__6.png"
+  },
+  {
+    "course": "Advanced_Programming",
+    "source_path": "/mnt/d/Project_and_Assignment/AI_project/data_cvt/CO2039_Advanced_Programming/Syllabus/slide_008.png",
+    "dest_json": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/ocr_json/slide_008.ocr.json",
+    "dest_text": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/text/slide_008.txt",
+    "dest_image": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/images/slide_008.png",
+    "dest_annotated": "/mnt/d/Project_and_Assignment/AI_project/test_advance_programming/Advanced_Programming/syllabus/annotated/annotated__7.png"
+  }
+]
