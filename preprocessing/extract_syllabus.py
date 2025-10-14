@@ -62,7 +62,7 @@ def value_in_col(recs, y, tol=40, x_min=640, x_max=760, regex=r"\d+(?:\.\d+)?"):
         return m.group("en").strip()
     return (m.group(1) if rx.groups else m.group(0)).strip()
 
-def extract_syllabus(items) -> Syllabus:
+def extract_syllabus(items) -> SyllabusV1:
     recs = records(items)
 
     # Header
