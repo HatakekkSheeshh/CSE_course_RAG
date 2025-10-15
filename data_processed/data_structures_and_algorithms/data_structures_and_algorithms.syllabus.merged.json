@@ -1,0 +1,76 @@
+{
+  "course_info": {
+    "title": "Data Structures and Algorithms",
+    "course_id": "CO2003",
+    "credits": 4,
+    "applied_semester": "20221"
+  },
+  "assessments": [
+    {
+      "name": "Lectures",
+      "hours": 30,
+      "credits": 0,
+      "ratio": null,
+      "evaluation_type": [
+        {
+          "name": "Midterm Exam",
+          "ratio": 10,
+          "duration_min": 80
+        },
+        {
+          "name": "Final Exam",
+          "ratio": 50,
+          "duration_min": 120
+        }
+      ]
+    },
+    {
+      "name": "Tutorial",
+      "hours": 0,
+      "credits": null,
+      "ratio": null,
+      "evaluation_type": []
+    },
+    {
+      "name": "Labs/Practices",
+      "hours": 30,
+      "credits": null,
+      "ratio": 10,
+      "evaluation_type": []
+    },
+    {
+      "name": "Projects",
+      "hours": 45,
+      "credits": null,
+      "ratio": 30,
+      "evaluation_type": []
+    },
+    {
+      "name": "Self-study",
+      "hours": 135,
+      "credits": null,
+      "ratio": null,
+      "evaluation_type": []
+    },
+    {
+      "name": "Others",
+      "hours": 0,
+      "credits": null,
+      "ratio": null,
+      "evaluation_type": []
+    }
+  ],
+  "metadata": {
+    "doc_type": "syllabus",
+    "course_id": "CO2003",
+    "source_file": "/mnt/d/Project_and_Assignment/AI_project/data_cvt/CO2003_Data_Structures_and_AlgoriThms/Syllabus/slide_001.png",
+    "page_index": 0,
+    "language": "en",
+    "ocr_engine": "PaddleOCR 3.2",
+    "extractor_version": "1.0.0",
+    "timestamp": "2025-10-12T20:05:29+07:00"
+  },
+  "raw_ocr_text": "HO CHI MINH CITY UNIVERSITY OF TECHNOLOGY BK TP.HCM TRUONG DAI HOC BACH KHOA - DHQG-HCM DCMH.C02003.5.1 Dai Hoc Qu6c Gia TP.HCM Vietnam National University - HCMC Truo'ng Dai Hoc Bach Khoa Ho Chi Minh City University of Technology Khoa Khoa hoc va Ky thuat May tinh Faculty of Computer Science and Engineering DE CUONG HOC PHAN Course Syllabus 1. Thong tin vé hoc phan (Course information) 1.1. Thöng tin töng quan (General information) - Tén hoc phan: Cäu trüc du liéu va giai thuat Course title: Data Structures and Algorithms  Ma hoc phan (Course ID): CO2003 - S6 tin chi (Credits): 4 (ETCS: 8 ) - Hoc ky äp dung (Applied from semester): 20221  To ch'c hoc phan (Course format) : Hinh thúc hoc tap Só tiét/gi S6 tin chi Ghi chü (Teaching/study type) (Hours) (Credits) (Notes) Ly thuyét (LT) 30 Lectures) Thao luan (ThL)/Thuc hanh tai l6p (TH) O Tutorial) Thi nghiem (TNg)/Thuc tap xuong (TT) 30 (Labs/Practices) Bai tap l6n (BTL)/D6 án (DA) 45 (Projects) Tu hoc (Self-study) 135 Khac (Others) 0 Tóng cöng (Total) 168.33 4  Ty lé dänh giä va hinh thuc kiém tra/thi (Evaluation form & ratio) Hinh thuc danh gia Ty le Hinh thürc Thi gian (Evaluation type) (Ratio) (Format) (Duration) Thao luan (ThL)/Thuc hanh tai l6p (TH) (Tutorial) Thi nghiém 10% (Labs/Practices) Bai tap l6n (BTL)/D6 án (DA) 30% (Projects) Kiém tra 10% Tu luan 80 phút (minutes) (Midterm Exam) (Constructed response) Thi 50% Träc nghiem va tu luan 120 phút (minutes) (Final Exam) (MCQ & Constructed response) Tong cong 100% (Total) 268 Ly Thuong Kiét,Phung 14,Quan 10,TP.HCM 268 Ly Thuong Kiet St., Ward 14, Dist. 10, Ho Chi Minh City, Vietnam Dién thoai: 028 3864 7256 Phone: 028 3864 7256 www.hcmut.edu.vn studeersnel www.hcmut.edu.vn Dit document is beschikbaar op Downloaded by Qu?c Hi?u Nguy?n (nguyenquochieujff7@gmail.com",
+  "course_des": {},
+  "schema_version": "syllabus.v1"
+}

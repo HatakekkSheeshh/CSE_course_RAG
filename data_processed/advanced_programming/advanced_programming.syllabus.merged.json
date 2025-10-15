@@ -1,0 +1,76 @@
+{
+  "course_info": {
+    "title": "Advanced_Programming",
+    "course_id": "CO2039",
+    "credits": 0,
+    "applied_semester": "HK202"
+  },
+  "assessments": [
+    {
+      "name": "Lectures",
+      "hours": 0,
+      "credits": 0,
+      "ratio": null,
+      "evaluation_type": [
+        {
+          "name": "Midterm exam",
+          "ratio": 0,
+          "duration_min": null
+        },
+        {
+          "name": "Final exam",
+          "ratio": 60,
+          "duration_min": 120
+        }
+      ]
+    },
+    {
+      "name": "Tutorial",
+      "hours": 0,
+      "credits": 0,
+      "ratio": 10,
+      "evaluation_type": []
+    },
+    {
+      "name": "Labs/Practices",
+      "hours": 0,
+      "credits": 0,
+      "ratio": 0,
+      "evaluation_type": []
+    },
+    {
+      "name": "Projects",
+      "hours": 0,
+      "credits": 0,
+      "ratio": 30,
+      "evaluation_type": []
+    },
+    {
+      "name": "Self-study",
+      "hours": 0,
+      "credits": 0,
+      "ratio": 0,
+      "evaluation_type": []
+    },
+    {
+      "name": "Others",
+      "hours": 0,
+      "credits": 0,
+      "ratio": 0,
+      "evaluation_type": []
+    }
+  ],
+  "metadata": {
+    "doc_type": "syllabus",
+    "course_id": "CO2039",
+    "source_file": "/mnt/d/Project_and_Assignment/AI_project/data_cvt/CO2039_Advanced_Programming/Syllabus/slide_001.png",
+    "page_index": 0,
+    "language": "en",
+    "ocr_engine": "PaddleOCR 3.2",
+    "extractor_version": "1.0.0",
+    "timestamp": "2025-10-12T20:12:23+07:00"
+  },
+  "raw_ocr_text": "1/7/25,7:40 AM DCMH.CO2039_Advanced Programming HO CHI MINH CITY UNIVERSITY OF TECHNOLOGY BK TRUONG DAI HQC BACH KHOA - DHQG-HCM TP.HCM DCMH.C02039.1.1 Dai Hoc Qu6c Gia TP.HCM Vietnam National University - HCMC Tru'o'ng Dai Hoc Bach Khoa Ho Chi Minh City University of Technology Khoa Khoa hoc va Ky thuat May tinh Faculty of Computer Science and Engineering DE CUONG HOC PHAN Course Syllabus 1. Thong tin v ehoc ph an (Course information) 1.1. Thong tin töng quan (General information) - Tén hoc ph`an: Lap trinh Nang cao ( Advanced Programming) - Ma hoc ph`an (Course ID): CO2039 - S tin chi (Credits): 0 (ECTS: -- ) - Hoc ky äp dung (Applied from semester): HK202 - T churc hoc ph`a, ty lé va hinh thurc danh gia (Course format, ratio & evaluation type): S6 tin Ghi Hinh thu'c hoc tap So tiet Ti le Hinh thu'c danh gia Thoi gian chi chu (Teaching/study type) (Lessons) (Ratio) (Evaluation type) (Duration) (Credits) (Notes) Kiem tra giua ky -- phut 0% (Midterm exam) - (minutes) (--) Ly thuyet (LT) 0 0 (Lectures) Thi (Final exam) - Tu 120 phut 60% luan (minutes) (Constructed response) Thäo luan (ThL) / Thuc hanh tai l6'p (TH) 0 0 10% (Tutorial) Thi nghiém (TNg) / Thuc tap xuo'ng (TT) 0 0 0% (Labs/Practices) Bai tap l6'n (BTL) / D`0an (DA) / Tieu luan (TL) / D`écuo'ng luan van (DCLV) / Luan van t6t 0 0 30% nghiép (LVTN) (Projects) Tu hoc (Self-study) 0 0 0% Khäc (Others) 0 0% TOng cöng (Total) 0 100 % 1.2. Di & kien tien quyet (Prerequisites) HT/KN: Recommended, TQ: Prereq, SH: Coreq Ma hoc ph an Ten hoc ph `an Tien quyet (TQ)/song hanh (SH) 1 (Course ID) (Course title) (Prerequisite - Prereq/Co - requisite - Coreq) 1.3. Hoc ph`an thuoc khoi kien thu'c (Knowledge block) 268 Ly Thuo'ng Kiet,Phuo'ng 14,Quan 10,TP.HCM 268 Ly Thuong Kiet St., Ward 14, Dist. 10, Ho Chi Minh City, Vietnam Dién thoai: 028 3864 7256. www.hcmut.edu.vn Phone: 028 3864 7256. www.hcmut.edu.vr about:blank 1/8",
+  "course_des": {},
+  "schema_version": "syllabus.v1"
+}

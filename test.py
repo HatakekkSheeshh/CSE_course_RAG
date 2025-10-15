@@ -1,142 +1,181 @@
 from __future__ import annotations
+import argparse, json, re, os
 from pathlib import Path
-import json
-from dataclasses import asdict
-from typing import Dict, List, Optional
+from typing import List, Dict, Any, Tuple
 
-from preprocessing.convert_data_to_img import convert_chapters_and_syllabus_to_images_parallel
-from preprocessing.dectector import OCRTextDetector
-from preprocessing.extract_syllabus import extract_syllabus
+import numpy as np
 
-from preprocessing.organize import save_ocr_result
-from preprocessing.pathing import extract_course_name
+# -------------------- build corpus (giữ nguyên kiểu test.py) -------------
+def _norm(s: str) -> str:
+    return re.sub(r"\s+", " ", (s or "")).strip()
 
-ROOT = Path(__file__).resolve().parent
+def build_corpus(d: Dict[str, Any]) -> str:
+    parts: List[str] = []
+    ci = d.get("course_info", {}) or {}
+    parts.append(f"Course title: {ci.get('title') or ''}")
+    parts.append(f"Course ID: {ci.get('course_id') or ''}")
+    parts.append(f"Credits: {ci.get('credits') or ''}")
+    parts.append(f"Applied semester: {ci.get('applied_semester') or ''}")
 
+    for comp in (d.get("assessments") or []):
+        line = [
+            f"Assessment: {comp.get('name') or ''}",
+            f"hours={comp.get('hours')}",
+            f"credits={comp.get('credits')}",
+        ]
+        if comp.get("ratio") is not None:
+            line.append(f"ratio={comp['ratio']}%")
+        et_parts = []
+        for et in (comp.get("evaluation_type") or []):
+            frag = et.get("name") or ""
+            if et.get("ratio") is not None:
+                frag += f" ({et['ratio']}%)"
+            if et.get("duration_min") is not None:
+                frag += f", duration={et['duration_min']} minutes"
+            et_parts.append(frag)
+        if et_parts:
+            line.append("eval=[" + "; ".join(et_parts) + "]")
+        parts.append(" | ".join(filter(None, line)))
 
-# ---------- Function Helpers ----------
-def _find_child_dir_casefold(parent: Path, name_cf: str) -> Optional[Path]:
-    for child in parent.iterdir():
-        if child.is_dir() and child.name.casefold() == name_cf:
-            return child
-    return None
+    parts.append(d.get("raw_ocr_text") or "")
+    return _norm("\n".join(parts))
 
+# ---------------------------- chunk with overlap -------------------------
+def chunk_text(text: str, chunk_words: int = 350, overlap_words: int = 60) -> List[Dict[str, Any]]:
+    words = re.findall(r"\S+", text)
+    chunks, i, idx = [], 0, 0
+    while i < len(words):
+        j = min(len(words), i + chunk_words)
+        chunk = " ".join(words[i:j])
+        chunks.append({"id": f"chunk_{idx}", "start": i, "end": j, "text": chunk})
+        idx += 1
+        if j == len(words):
+            break
+        i = max(j - overlap_words, i + 1)
+    return chunks
 
-def collect_syllabus_images_by_course(root: Path) -> Dict[Path, List[Path]]:
-    """
-    Return a mapping of:
-        { <course_dir_path>: [list of image paths under its Syllabus/**] }
-    Courses without a Syllabus/ folder are omitted.
-    """
-    data_cvt = root / "data_cvt"
-    image_exts = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tif", ".tiff"}
-    out: Dict[Path, List[Path]] = {}
+# ----------------------- Sentence-Transformers + FAISS -------------------
+def embed_texts(texts: List[str], model_name: str, device: str = "cpu", batch_size: int = 64) -> np.ndarray:
+    from sentence_transformers import SentenceTransformer
+    model = SentenceTransformer(model_name, device=device)
+    # encode returns np.ndarray [N, D]
+    emb = model.encode(texts, batch_size=batch_size, show_progress_bar=False, normalize_embeddings=False)
+    # L2-normalize để dùng dot-product ~ cosine
+    norms = np.linalg.norm(emb, axis=1, keepdims=True) + 1e-12
+    emb = emb / norms
+    return emb.astype("float32")
 
-    if not data_cvt.is_dir():
-        return out
+def build_faiss_index(emb: np.ndarray):
+    import faiss
+    dim = emb.shape[1]
+    index = faiss.IndexFlatIP(dim)  # inner product ~ cosine (vì đã L2-normalize)
+    index.add(emb)                  # add all vectors
+    return index
 
-    for course_dir in sorted([p for p in data_cvt.iterdir() if p.is_dir()]):
-        syllabus_dir = _find_child_dir_casefold(course_dir, "syllabus")
-        if syllabus_dir is None:
-            continue
+def search_faiss(index, query_vec: np.ndarray, k: int = 5) -> Tuple[np.ndarray, np.ndarray]:
+    D, I = index.search(query_vec, k)  # distances (cosine sim), indices
+    return D, I
 
-        imgs = [p for p in syllabus_dir.rglob("*")
-                if p.is_file() and p.suffix.lower() in image_exts]
-        if imgs:
-            out[course_dir] = sorted(imgs)
-    return out
+# ------------------------------- main ------------------------------------
+def main():
+    ap = argparse.ArgumentParser(description="Chunk + Overlap + Sentence-Transformers + FAISS + Query")
+    ap.add_argument("--src", required=True, help="Path to <course>.syllabus.merged.json")
+    ap.add_argument("--out-dir", required=True, help="Output directory for artifacts")
+    ap.add_argument("--chunk-words", type=int, default=350)
+    ap.add_argument("--overlap-words", type=int, default=60)
+    ap.add_argument("--model", default="sentence-transformers/all-MiniLM-L6-v2",
+                    help="Sentence-Transformers model name (default: all-MiniLM-L6-v2)")
+    ap.add_argument("--device", default="cpu", help="cpu or cuda")
+    ap.add_argument("--batch-size", type=int, default=64)
+    ap.add_argument("--queries", nargs="*", default=[
+        "final exam ratio",
+        "midterm exam duration minutes",
+        "applied semester HK202",
+        "course credits",
+    ])
+    ap.add_argument("--top-k", type=int, default=5)
+    args = ap.parse_args()
 
+    src = Path(args.src)
+    out_dir = Path(args.out_dir); out_dir.mkdir(parents=True, exist_ok=True)
 
-# ---------- Pipeline ----------
-def main(do_convert: bool = False):
-    """
-    End-to-end pipeline (Syllabus-only, grouped by course):
-      1) (optional) Convert PDFs -> images into data_cvt/
-      2) Build {course_dir: [Syllabus images]}
-      3) For each course:
-           - OCR each image -> items
-           - Extract syllabus from items
-           - Persist into data/<course>/syllabus/{ocr_json,text,annotated?,images?}
-    """
-    # data_root = ROOT / "data"
-    # data_cvt_root = ROOT / "data_cvt"
+    # 1) Load + build corpus + chunk
+    data = json.loads(src.read_text(encoding="utf-8"))
+    full_text = build_corpus(data)
+    chunks = chunk_text(full_text, args.chunk_words, args.overlap_words)
 
-    # 1) Convert (optional). Converter may generate multiple outputs,
-    if do_convert:
-        print("Converting (may generate both Chapters and Syllabus outputs)...")
-        _ = convert_chapters_and_syllabus_to_images_parallel(
-            data_root=ROOT / "data_raw",
-            out_root=ROOT / "data_cvt",
-            dpi=220,
-            fmt="png",
-            overwrite=False,
-            keep_temp_pdf=False,
-            max_workers=3,
-        )
+    # Save chunks jsonl (tiện debug)
+    chunks_jsonl = out_dir / f"{src.stem.replace('.syllabus.merged','')}.syllabus.chunks.jsonl"
+    with chunks_jsonl.open("w", encoding="utf-8") as f:
+        for ch in chunks:
+            f.write(json.dumps(ch, ensure_ascii=False) + "\n")
+    print("[JSONL]", chunks_jsonl)
 
-    # 2) Collect images grouped by course
-    images_by_course = collect_syllabus_images_by_course(ROOT)
-    if not images_by_course:
-        print("No Syllabus images found under data_cvt/<COURSE_DIR>/Syllabus/. Nothing to do.")
-        return
+    # 2) Embed all chunks
+    chunk_texts = [c["text"] for c in chunks]
+    emb = embed_texts(chunk_texts, model_name=args.model, device=args.device, batch_size=args.batch_size)
 
-    # 3) Initialize OCR detector once
-    print("Detecting (OCR)...")
-    out_dir = ROOT / "scratch"  # For debug outputs (JSON, annotated.png)
-    # out_dir = None
-    detector = OCRTextDetector(out_dir=str(out_dir))  
+    # 3) Build FAISS index
+    index = build_faiss_index(emb)
 
-    
-    course_dir = ROOT / "data_cvt" / "CO2039_Advanced_Programming"
-    course_name = extract_course_name(course_dir.name)
-    images = images_by_course[course_dir]
-    processed = 0
-    for img_path in images:
-        print(f"--- Processing image: {img_path.name}")
-        if not img_path.exists():
-            continue
+    # 4) Persist index + mapping
+    #    - .index: faiss binary
+    #    - .npy  : numpy embeddings (optional)
+    #    - .meta.json: chunk metadata (ids, start, end) để map kết quả -> snippet
+    try:
+        import faiss
+        idx_path = out_dir / f"{src.stem.replace('.syllabus.merged','')}.syllabus.faiss.index"
+        faiss.write_index(index, str(idx_path))
+        print("[FAISS] index ->", idx_path)
+    except Exception as e:
+        print("[FAISS] write_index skipped:", e)
 
-        # 3.1) OCR -> items
-        # The annoted.png can be captured from items, do it latter ...
-        items = detector.run(str(img_path))
-        plain_text = " ".join([it.get("text", "") for it in items if it.get("text")])
+    npy_path = out_dir / f"{src.stem.replace('.syllabus.merged','')}.syllabus.embeddings.npy"
+    np.save(npy_path, emb)
+    print("[NPY] embeddings ->", npy_path)
 
-        # 3.2) Extract structured syllabus (your existing logic)
-        syllabus = extract_syllabus(items)
+    meta = [{"id": c["id"], "start": c["start"], "end": c["end"]} for c in chunks]
+    meta_path = out_dir / f"{src.stem.replace('.syllabus.merged','')}.syllabus.meta.json"
+    meta_path.write_text(json.dumps(meta, ensure_ascii=False, indent=2), encoding="utf-8")
+    print("[META] ->", meta_path)
 
-        # 3.3) Persist outputs in normalized layout:
-        #      data/<course>/syllabus/{ocr_json,text,images?,annotated?}
-        out_paths, layout = save_ocr_result(
-            src_file=img_path,
-            items=items,
-            plain_text=plain_text,
-            annotated_image=ROOT / "scratch" / "annotated.png",       # pass a path or PIL image if rendering bboxes is necessary
-            copy_source_image=True,                                 
-            data_root=ROOT / "test_advance_programming", # Out path root
-            data_cvt_root=ROOT / "data_cvt",
-            extra_meta={"engine": "paddleocr"},
-        )
+    # (optional) parquet cho chunks
+    try:
+        import pyarrow as pa, pyarrow.parquet as pq
+        pq.write_table(pa.Table.from_pylist(chunks),
+                       str(out_dir / f"{src.stem.replace('.syllabus.merged','')}.syllabus.chunks.parquet"))
+    except Exception:
+        pass
 
-        # 3.4) Save extracted syllabus JSON under .../syllabus/parsed
-        parsed_dir = layout.syllabus_root / "parsed"
-        parsed_dir.mkdir(parents=True, exist_ok=True)
-        parsed_json = parsed_dir / f"{img_path.stem}.syllabus.json"
-        parsed_json.write_text(json.dumps(asdict(syllabus), ensure_ascii=False, indent=2), encoding="utf-8")
+    # 5) Interactive queries (demo)
+    from sentence_transformers import SentenceTransformer
+    model = SentenceTransformer(args.model, device=args.device)
 
-        print(f"[OK] {img_path.name}")
-        print(f"     OCR JSON  : {out_paths['json']}")
-        if out_paths['text']:
-            print(f"     TEXT      : {out_paths['text']}")
-        print(f"     PARSED    : {parsed_json}")
-        print("\n")
+    def embed_query(q: str) -> np.ndarray:
+        qv = model.encode([q], normalize_embeddings=True)  # normalize ở đây luôn
+        return qv.astype("float32")
 
-    
-        processed += 1
-
-        print(f"--- Done course: {course_name} | images processed: {processed}")
-
-    print(f"\nAll done.")
-
+    for q in args.queries:
+        qv = embed_query(q)
+        D, I = search_faiss(index, qv, k=args.top_k)
+        print(f"\nQ: {q}")
+        for rank, (idx, score) in enumerate(zip(I[0], D[0]), start=1):
+            ch = chunks[int(idx)]
+            snip = ch["text"][:200].replace("\n", " ")
+            print(f"  {rank}. score={score:.4f} | {ch['id']} | {snip}...")
 
 if __name__ == "__main__":
-    main(do_convert=False)
+    main()
+
+
+"""
+python3 test.py \
+  --src data_processed/advanced_programming/advanced_programming.syllabus.merged.json \
+  --out-dir data_processed/advanced_programming \
+  --chunk-words 350 --overlap-words 60 \
+  --model sentence-transformers/all-MiniLM-L6-v2 \
+  --device cpu \
+  --top-k 5 \
+  --queries "final exam ratio" "midterm exam duration minutes" "applied semester HK202" "course credits"
+
+"""

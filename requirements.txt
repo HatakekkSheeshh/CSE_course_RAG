@@ -12,3 +12,6 @@ tiktoken>=0.7
 matplotlib
 
 faiss-cpu
+pyarrow
+fastparquet
+sentence-transformers

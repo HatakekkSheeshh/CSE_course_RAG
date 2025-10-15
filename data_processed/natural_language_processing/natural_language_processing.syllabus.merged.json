@@ -1,0 +1,76 @@
+{
+  "course_info": {
+    "title": "Natural Language Processing",
+    "course_id": "CO3085",
+    "credits": 3,
+    "applied_semester": "20213"
+  },
+  "assessments": [
+    {
+      "name": "Lectures",
+      "hours": 30,
+      "credits": null,
+      "ratio": null,
+      "evaluation_type": [
+        {
+          "name": "Midterm Exam",
+          "ratio": 30,
+          "duration_min": 60
+        },
+        {
+          "name": "Final Exam",
+          "ratio": 40,
+          "duration_min": 90
+        }
+      ]
+    },
+    {
+      "name": "Tutorial",
+      "hours": 30,
+      "credits": null,
+      "ratio": 15,
+      "evaluation_type": []
+    },
+    {
+      "name": "Labs/Practices",
+      "hours": 0,
+      "credits": null,
+      "ratio": null,
+      "evaluation_type": []
+    },
+    {
+      "name": "Projects",
+      "hours": 0,
+      "credits": null,
+      "ratio": 15,
+      "evaluation_type": []
+    },
+    {
+      "name": "Self-study",
+      "hours": 87,
+      "credits": null,
+      "ratio": null,
+      "evaluation_type": []
+    },
+    {
+      "name": "Others",
+      "hours": 0,
+      "credits": null,
+      "ratio": null,
+      "evaluation_type": []
+    }
+  ],
+  "metadata": {
+    "doc_type": "syllabus",
+    "course_id": "CO3085",
+    "source_file": "/mnt/d/Project_and_Assignment/AI_project/data_cvt/CO3085_Natural_Language_Processing/Syllabus/slide_001.png",
+    "page_index": 0,
+    "language": "en",
+    "ocr_engine": "PaddleOCR 3.2",
+    "extractor_version": "1.0.0",
+    "timestamp": "2025-10-12T20:20:01+07:00"
+  },
+  "raw_ocr_text": "10:06,04/09/2022 DCMH.CO3085_Natural Language Processing HO CHI MINH CITY UNIVERSITY OF TECHNOLOGY BK TP.HCM TRUONG DAI HOC BACH KHOA - DHQG-HCM DCMH.C03085.3.1 Dai Hoc Qu6c Gia TP.HCM Vietnam National University - HCMC Truo'ng Dai Hoc Bach Khoa Ho Chi Minh City University of Technology Khoa Khoa hoc va Ky thuat Mäy tinh Faculty of Computer Science and Engineering DE CUONG HOC PHAN Course Syllabus 1. Thong tin vé hoc phan (Course information) 1.1. Thng tin töng quan (General information)  Tén hoc phan: Xu ly ngon ngü tu nhien Course title: Natural Language Processing  Ma hoc phan (Course ID): CO3085  S6 tin chi (Credits): 3 (ETCS: 6 )  Hoc ky ap dung (Applied from semester): 20213  To chúc hoc phan (Course format): Hinh thúrc hoc tap Só tiét/gi S6 tin chi Ghi chü (Teaching/study type) (Hours) (Credits) (Notes) Ly thuyét (LT) 30 (Lectures) Thao luan (ThL)/Thuc hanh tai lóp (TH) 30 (Tutorial) Thi nghiem (TNg)/Thuc tap xuong (TT) 0 (Labs/Practices) Bai tap l6n (BTL)/D6 än (DA) 0 (Projects) Tu hoc (Self-study) 87.5 Khac (Others) Tong cöng (Total) 150 3  Ty lé danh gia va hinh thúc kiém tra/thi (Evaluation form & ratio) Hinh thuc danh gia Ty le Hinh thürc Thoi gian (Evaluation type) (Ratio) (Format) (Duration) Thao luan (ThL)/Thuc hanh tai l6p (TH) 15% (Tutorial) Thi nghiém (Labs/Practices) Bai tap l6n (BTL)/D6 an (DA) 15% (Projects) Kiém tra 30% Tu luan 60 phüt (minutes) (Midterm Exam) (Constructed response) Thi 40% Tu luan 90 phüt (minutes) (Final Exam) (Constructed response) Tong cöng 100% (Total) 268 Ly Thu&ng Kiet,Phuong 14,Quan 10,TP.HCM 268 Ly Thuong Kiet St., Ward 14, Dist. 10, Ho Chi Minh City, Vietnam Dién thoai: 028 3864 7256 Phone: 028 3864 7256 www.hcmut.edu.vn www.hcmut.edu.vn 1/12",
+  "course_des": {},
+  "schema_version": "syllabus.v1"
+}

@@ -15,7 +15,7 @@ import cv2, tempfile
 class OCRTextDetector:
     def __init__(
         self,
-        lang: str = "en",
+        lang: str = "vi",
         score_thr: float = 0.5,
         out_dir: Optional[Path | str] = None,
         use_preproc: bool = True,
@@ -29,7 +29,7 @@ class OCRTextDetector:
         - use_preproc: preprocessor (bilateral + gray)
         - **ocr_kwargs: valid parameters of PaddleOCR
         """
-        from paddleocr import PaddleOCR
+        from paddleocr import PaddleOCR  # pyright: ignore[reportMissingImports]
         self.ocr = PaddleOCR(
             lang = lang,
             use_textline_orientation = False,
@@ -43,6 +43,8 @@ class OCRTextDetector:
         if self.out_dir:
             self.out_dir.mkdir(parents=True, exist_ok=True)
         self.use_preproc = use_preproc
+
+        
 
     # ---------- utils ----------
     @staticmethod
@@ -152,8 +154,8 @@ class OCRTextDetector:
             json.dumps(items, indent=2, ensure_ascii=False), encoding="utf-8"
         )
 
-    def run(self, img_path: Path | str):
-        print("Start extracting...")
+    def predict(self, img_path: Path | str):
+        print("Start predicting...")
         items, img_bgr = self.predict_items(img_path)
         self.save_items(items)
         self.annotate(img_bgr, items)

@@ -1,20 +1,22 @@
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Literal
 
 @dataclass
-class Meta:
-    doc_type: str           # "slide" | "syllabus" | 
-    course_id: str
-    source_file: str
-    slide_index: int
-    heading: Optional[str] = None
-    language: Optional[str] = None
+class Metadata:
+    doc_type: Literal["syllabus", "slide"] = "syllabus"
+    course_id: str = ""                                     # "CO1005"
+    source_file: Optional[str] = None                       # "path/to/image_or_pdf#page=1"
+    page_index: int = 0
+    language: str = "en"
+    ocr_engine: Optional[str] = None                        # "PaddleOCR 2.7"
+    extractor_version: Optional[str] = None                 # "1.0.0"
+    timestamp: Optional[str] = None                         # ISO8601
 
 @dataclass
 class DocChunk:
     id: str
     text: str
-    metadata: Meta
+    metadata: Metadata
 
 """
 chunk = DocChunk(

@@ -1,0 +1,76 @@
+{
+  "course_info": {
+    "title": "Introduction to Computing",
+    "course_id": "CO1005",
+    "credits": 3,
+    "applied_semester": "20231"
+  },
+  "assessments": [
+    {
+      "name": "Lectures",
+      "hours": 30,
+      "credits": 2,
+      "ratio": null,
+      "evaluation_type": [
+        {
+          "name": "Midterm Exam",
+          "ratio": 30,
+          "duration_min": 60
+        },
+        {
+          "name": "Final Exam",
+          "ratio": 30,
+          "duration_min": 60
+        }
+      ]
+    },
+    {
+      "name": "Tutorial",
+      "hours": null,
+      "credits": null,
+      "ratio": null,
+      "evaluation_type": []
+    },
+    {
+      "name": "Labs/Practices",
+      "hours": 20,
+      "credits": 0.7,
+      "ratio": 10,
+      "evaluation_type": []
+    },
+    {
+      "name": "Projects",
+      "hours": 15,
+      "credits": 0.3,
+      "ratio": 30,
+      "evaluation_type": []
+    },
+    {
+      "name": "Self-study",
+      "hours": 83,
+      "credits": null,
+      "ratio": null,
+      "evaluation_type": []
+    },
+    {
+      "name": "Others",
+      "hours": 83,
+      "credits": 83,
+      "ratio": null,
+      "evaluation_type": []
+    }
+  ],
+  "metadata": {
+    "doc_type": "syllabus",
+    "course_id": "CO1005",
+    "source_file": "/mnt/d/Project_and_Assignment/AI_project/data_cvt/CO1005_Introduction_to_Computing/Syllabus/slide_001.png",
+    "page_index": 0,
+    "language": "en",
+    "ocr_engine": "PaddleOCR 3.2",
+    "extractor_version": "1.0.0",
+    "timestamp": "2025-10-12T20:00:17+07:00"
+  },
+  "raw_ocr_text": "8/17/23, 11:05 AM DCMH.CO1005_Introduction to Computing HO CHI MINH CITY UNIVERSITY OF TECHNOLOGY BK TP.HCM TRUONG DAI HOC BACH KHOA - DHQG-HCM Dai Hoc Qu6c Gia TP.HCM Vietnam National University - HCMC Truong Dai Hoc Bach Khoa Ho Chi Minh City University of Technology Khoa Khoa hoc va Ky thuat May tinh Faculty of Computer Science and Engineering DE CUONG HOC PHAN Course Syllabus 1. Thong tin ve hoc phan (Course information) 1.1. Thng tin töng quan (General information) - Tén hoc phän: Nhap mon dien toan - Course title: Introduction to Computing - Ma hoc phan (Course ID): CO1005  S6 tin chi (Credits): 3 (ETCS: 6 ) - Hoc ky äp dung (Applied from semester) : 20231  To chúc hoc phan (Course format) : Hinh thuc hoc tap só tiét/gi S6 tin chi Ghi chu (Teaching/study type) (Hours) (Credits) (Notes) Ly thuyét (LT) 30 2 (Lectures) Thao luan (ThL)/Thuc hanh tai l6p (TH) Tutorial) Thi nghi&m (TNg)/Thuc tap xuóng (TT) 20 0.7 Labs/Practices) Bai tap l6n (BTL)/D6 än (DA) 15 0.3 (Projects) Tu hoc (Self-study) 83 Khäc (Others) Tóng cöng (Total) 50 3 (Ghi chü: Cäu hinh mön hoc mau undefined -)  Ty lé dänh gia va hinh thúc kiém tra/thi (Evaluation form & ratio) Hinh thüc danh gia Ty le Hinh thurc Thoi gian (Evaluation type) (Ratio) (Format) (Duration) Thao luan (ThL)/Thuc hanh tai lóp (TH) (Tutorial) Thi nghiém 10% (Labs/Practices) Bai tap l6n (BTL)/D6 án (DA) 30% (Projects) Kiém tra 30% Träc nghiém 60 phüt (minutes) (Midterm Exam) (Multiple choice (MCQ)) Thi 30% Träc nghiém 60 phut (minutes) (Final Exam) (Multiple choice (MCQ)) Tong cong 100% (Total) 268 Ly Thung Kiet,Phu&ng 14,Quan 10,TP.HCM 268 Ly Thuong Kiet St., Ward 14, Dist. 10, Ho Chi Minh City, Vietnam Dién thoai: 028 3864 7256 Phone: 028 3864 7256 www.hcmut.edu.vn studeersnel www.hcmut.edu.vn Dit document is beschikbaar op about:blank 1/7 Downloaded by Hanh Nguyen (hanh91520@gmail.com)",
+  "course_des": {},
+  "schema_version": "syllabus.v1"
+}

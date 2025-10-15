@@ -1,0 +1,76 @@
+{
+  "course_info": {
+    "title": "Operating Systems",
+    "course_id": "CO2017",
+    "credits": 3,
+    "applied_semester": "20221"
+  },
+  "assessments": [
+    {
+      "name": "Lectures",
+      "hours": 30,
+      "credits": null,
+      "ratio": null,
+      "evaluation_type": [
+        {
+          "name": "Midterm Exam",
+          "ratio": null,
+          "duration_min": null
+        },
+        {
+          "name": "Final Exam",
+          "ratio": 50,
+          "duration_min": 90
+        }
+      ]
+    },
+    {
+      "name": "Tutorial",
+      "hours": 0,
+      "credits": null,
+      "ratio": null,
+      "evaluation_type": []
+    },
+    {
+      "name": "Labs/Practices",
+      "hours": 20,
+      "credits": null,
+      "ratio": 20,
+      "evaluation_type": []
+    },
+    {
+      "name": "Projects",
+      "hours": 15,
+      "credits": null,
+      "ratio": 30,
+      "evaluation_type": []
+    },
+    {
+      "name": "Self-study",
+      "hours": 83,
+      "credits": null,
+      "ratio": null,
+      "evaluation_type": []
+    },
+    {
+      "name": "Others",
+      "hours": 0,
+      "credits": null,
+      "ratio": null,
+      "evaluation_type": []
+    }
+  ],
+  "metadata": {
+    "doc_type": "syllabus",
+    "course_id": "CO2017",
+    "source_file": "/mnt/d/Project_and_Assignment/AI_project/data_cvt/CO2017_Operating_Systems/Syllabus/slide_001.png",
+    "page_index": 0,
+    "language": "en",
+    "ocr_engine": "PaddleOCR 3.2",
+    "extractor_version": "1.0.0",
+    "timestamp": "2025-10-12T20:11:29+07:00"
+  },
+  "raw_ocr_text": "DCMH.CO2017_Operating Systems 21/11/2022,16:04 HO CHI MINH CITY UNIVERSITY OF TECHNOLOGY BK TP.HCM TRUONG DAI HOC BACH KHOA - DHQG-HCM Dai Hoc Quδc Gia TP.HCM Vietnam National University - HCMC Truo'ng Dai Hoc Bach Khoa Ho Chi Minh City University of Technology Khoa Khoa hoc va Ky thuat May tinh Faculty of Computer Science and Engineering DE CUONG HOC PHAN Course Syllabus 1. Thong tin vé hoc phan (Course information) 1.1. Thng tin tóng quan (General information)  Tén hoc phän: He diéu hanh Course title: Operating Systems  Ma hoc phan (Course ID): CO2017 - S6 tin chi (Credits): 3 (ETCS: 6 )  Hoc ky áp dung (Applied from semester) : 20221  Tó chúc hoc phan (Course format) : Hinh thúc hoc tap Só tiét/gi  só tín chi  Ghi chu (Teaching/study type) (Hours) (Credits) (Notes) Ly thuyét (LT) 30 (Lectures) Thao luan (ThL/Thuc hanh tai l6p (TH) 0 (Tutorial) Thi nghiém (TNg)/Thuc tap xuong (TT) 20 Labs/Practices) Bäi tap l6n (BTL)/D6 án (DA) 15 (Projects) Tu hoc (Self-study) 83.5 Khäc (Others) O Tóng cöng (Total) 150 3  Ty lé dänh giá va hinh thúc kiém tra/thi (Evaluation form & ratio) Hinh thüc danh gia Ty le Hinh thüc Thi gian (Evaluation type) (Ratio) (Format) (Duration) Thao luan (ThL)/Thuc hanh tai l6p (TH) (Tutorial) Thi nghiém 20% Labs/Practices Bai tap l6n (BTL)/D6 án (DA) 30% (Projects) Kiém tra -- phút (minutes) (Midterm Exam) (--) Thi 50% Trac nghiém 90 phút (minutes) (Final Exam) (Multiple choice (MCQ)) Tong cong 100% (Total) https://mybk.hcmut.edu.vn/app/he-thong-quan-ly-dao-tao/ctdt/dcmh/editor Page 1 of 6",
+  "course_des": {},
+  "schema_version": "syllabus.v1"
+}

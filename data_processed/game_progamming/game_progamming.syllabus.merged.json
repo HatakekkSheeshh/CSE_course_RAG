@@ -1,0 +1,70 @@
+{
+  "course_info": {
+    "title": "Game_Programming",
+    "course_id": "CO3045",
+    "credits": 3,
+    "applied_semester": "HK191"
+  },
+  "assessments": [
+    {
+      "name": "Lectures",
+      "hours": 30,
+      "credits": 0,
+      "ratio": null,
+      "evaluation_type": [
+        {
+          "name": "Final exam",
+          "ratio": 40,
+          "duration_min": 90
+        }
+      ]
+    },
+    {
+      "name": "Tutorial",
+      "hours": 0,
+      "credits": 0,
+      "ratio": 0,
+      "evaluation_type": []
+    },
+    {
+      "name": "Labs/Practices",
+      "hours": 30,
+      "credits": 0,
+      "ratio": 0,
+      "evaluation_type": []
+    },
+    {
+      "name": "Projects",
+      "hours": 0,
+      "credits": 0,
+      "ratio": 60,
+      "evaluation_type": []
+    },
+    {
+      "name": "Self-study",
+      "hours": 0,
+      "credits": 0,
+      "ratio": 0,
+      "evaluation_type": []
+    },
+    {
+      "name": "Others",
+      "hours": 0,
+      "credits": 0,
+      "ratio": 0,
+      "evaluation_type": []
+    }
+  ],
+  "metadata": {
+    "doc_type": "syllabus",
+    "source_file": "/mnt/d/Project_and_Assignment/AI_project/data_cvt/CO3045_Game_Progamming/Syllabus/slide_001.png",
+    "page_index": 0,
+    "language": "en",
+    "ocr_engine": "PaddleOCR 3.2",
+    "extractor_version": "1.0.0",
+    "timestamp": "2025-10-12T20:17:31+07:00"
+  },
+  "raw_ocr_text": "Dai Hoc Quóc Gia TP.HCM Vietnam National University - HCMC Truö'ng Dai Hoc Bách Khoa Ho Chi Minh City University of Technology B K TP.HCM Khoa Khoa hoc va Ky thuat Mäy tinh Faculty of Computer Science and Engineering Dé cuong mn hoc LAP TRINH GAME (Game Programming) S6 tin chi 3 ETCS MSMH C03045 Hoc Ky äp dung HK191 Só tiét/Gi Tóng tiét Tóng gi hoc LT BT/TH TNg TQ BTL/TL/ TTNT DC/TLTN SVTH TKB tap/lam viec DA LVTN 33 120 33 36 (*) 51 Phan bó tin chi 2.2 0.8 Mn khng xép TKB Ti le danh gia BT: 0% TN: 0% TH: 0% KT: 0% BTL/TL: 60% Thi: 40% Thi gian Kiém Tra Hinh thüc danh Bai tap lón góm 5-6 bai trong có 1 bai 3D va 1 bai lam ca gia nhan.  Thi: viét + trac nghiém 90 Thöi gian Thi 90 phút  Diém cuói ki: trung binh diéu höa cua diém bái tap lón cá nhan va diém bai thi cuói ki Mn tién quyét Mön hoc tru6c Mang may tinh, Tri tué nhan tao CO3003, CO3061 Mön song hanh CTDT nganh Khoa hoc may tinh; Ky thuat may tinh Trinh d dao tao Dai hoc Cap dö mn hoc  3 (day cho sinh vién nam ba) Ghi chü khac (*)Sinh vién sé phái tu hoc va giáng vién sáp gi linh hoat hang tuán phan hi thac mác va hö tro sinh vién lám BTL. Muctiéu cúa mn hoc: Món hoc nay la mn hoc dau tien vé lap trinh game, danh cho sinh vien có kién thúc tót vé Cáu trúc dü lieu, va Tri tué nhan tao. Mon hoc cung cäp cäc kién thüc nén täng vé lap trinh game. Aims: The course aims to provides background knowledge of game programming for students with good knowledge of Data Structures, and Artificial Intelligence. Nidung tóm tat mn hoc: Kién thüc toän hoc va vat ly äp dung trong game Lap trinh game 2D Lap trinh game 3D Cac thé loai game thuong gap Course outline: Knowledge base of math and physics applied in the game 2D game programming 3D game programming Common types of games Tailiéu hoc tap: 1] Sanjay Madhav, Game Programming Algorithms and Techniques - A Platform Agnostic Approach, 2014. [2] AI Sweigart, Making Games with Python & Pygame, 2012 [3] Mat Buckland, Programming Game AI By Example, 2004",
+  "course_des": {},
+  "schema_version": "syllabus.v1"
+}

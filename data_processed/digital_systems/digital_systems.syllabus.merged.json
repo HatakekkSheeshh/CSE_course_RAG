@@ -1,0 +1,75 @@
+{
+  "course_info": {
+    "title": "Digital Systems",
+    "course_id": "CO1023",
+    "credits": 3,
+    "applied_semester": "HK191"
+  },
+  "assessments": [
+    {
+      "name": "Lectures",
+      "hours": 30,
+      "credits": 0,
+      "ratio": null,
+      "evaluation_type": [
+        {
+          "name": "Mid-term exam",
+          "ratio": 20,
+          "duration_min": 50
+        },
+        {
+          "name": "Final exam",
+          "ratio": 50,
+          "duration_min": 90
+        }
+      ]
+    },
+    {
+      "name": "Tutorial",
+      "hours": 0,
+      "credits": 0,
+      "ratio": 0,
+      "evaluation_type": []
+    },
+    {
+      "name": "Labs/Practices",
+      "hours": 30,
+      "credits": 0,
+      "ratio": 30,
+      "evaluation_type": []
+    },
+    {
+      "name": "Projects",
+      "hours": 0,
+      "credits": 0,
+      "ratio": 0,
+      "evaluation_type": []
+    },
+    {
+      "name": "Self-study",
+      "hours": 0,
+      "credits": 0,
+      "ratio": 0,
+      "evaluation_type": []
+    },
+    {
+      "name": "Others",
+      "hours": 0,
+      "credits": 0,
+      "ratio": 0,
+      "evaluation_type": []
+    }
+  ],
+  "metadata": {
+    "doc_type": "syllabus",
+    "source_file": "/mnt/d/Project_and_Assignment/AI_project/data_cvt/CO1023_Digital_Systems/Syllabus/slide_001.png",
+    "page_index": 0,
+    "language": "en",
+    "ocr_engine": "PaddleOCR 3.2",
+    "extractor_version": "1.0.0",
+    "timestamp": "2025-10-12T20:02:45+07:00"
+  },
+  "raw_ocr_text": "Dai Hoc Qu6c Gia TP.HCM Vietnam National University - HCMC BK Truo'ng Dai Hoc Bach Khoa Ho Chi Minh City University of Technology TP.HCM Khoa Khoa hoc va KT May tinh Faculty of Computer Science and Engineering Dé cuong mn hoc HE THONG Só (Digital Systems S6 tin chi 3 ETCS 5,08 MSMH C01023 Hoc Ky ap dung HK191 Só tiét/Gi Tóng tiét Tóng gio hoc LT BT/TH TNg TQ BTL/TL/ TTNT DC/TLTN/ SVTH TKB tap/lam viec DA LVTN 60 152,3 30 30 90 Phan bó tin chi 2 1 Mön khng xép TKB Ti le danh gia BT: 10% TN: 30% TH: 0% KT: 20% BTL/TL: Thi: 50% Kiém tra dänh giá thung xuyén ( BT ): Bai tap trén lóp. Thi gian Kiém Tra 50 phút Hinh thüc danh Bai tap vé nha ( nhóm, ca nhan ), bai tap online, chuyén gia can. Bai täp l6n ( BTL ): Tiéu luan / Thuyét trinh Thi gian Thi 90 phut Kiém tra giua ky ( KT ): Trac nghiém /Tu luan Thi: Trac nghiém /Tu luan Mön tién quyét Khöng Mön hoc tru6c Khöng Mon song hanh Khöng CTDT nganh Ky Thuat May Tinh; Khoa Hoc May Tinh Trinh d dáo tao Dai hoc Cap d mön hoc cäp d 1 (day cho sinh vién nám 1) Ghi chü khac * Xin xem huóng dan  cuói dé cuong Number of Credits 3 (2.2.5) Course Number C01023 Class hours Total: 60 Lecture: 30 Tutorial: Lab: 30 Assignments: Project, Internship, Thesis Assessment Ex: Lab: 30% Mid-term Assignments: Final exam: exam: 20% 50% Methods of assessment - Midterm exam: 50  Final Exam: 90 Prerequisite (have completed) None Prerequisite (have studied) None Corequisite None Applicable Programs Computer Engineering, Computer Science Course Level Notes",
+  "course_des": {},
+  "schema_version": "syllabus.v1"
+}
