@@ -1,0 +1,12 @@
+version: "3.8"
+services:
+  app:
+    build: .
+    image: cse_course_rag:latest
+    volumes:
+      - .:/workspace:rw
+    working_dir: /workspace
+    tty: true
+    stdin_open: true
+    ports:
+      "8000:8000"

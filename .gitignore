@@ -228,3 +228,5 @@ cache/
 cache
 
 note.txt
+.vscode
+./vscode    

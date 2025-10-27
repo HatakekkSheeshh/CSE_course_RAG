@@ -14,7 +14,6 @@ def canonical_course_card(d: Dict) -> str:
     """ course_info """
     ci = d["course_info"]
     fmt = ci["course_format"]
-    # Nhất quán đơn vị giờ, số thập phân, và thứ tự trường để embedding ổn định
     return (
         f"Course: {ci['title']} ({ci['course_id']}). "
         f"Credits: {ci['credits']}. Applied semester: {ci['applied_semester']}. "
