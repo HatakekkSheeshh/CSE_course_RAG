@@ -20,4 +20,3 @@ sentence-transformers
 
 # webapp
 streamlit
-streamlit-llm
