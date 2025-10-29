@@ -38,6 +38,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     fonts-liberation \
     fonts-noto-core \
     fonts-noto-cjk \
+    # Extra runtime deps for some wheels (OpenMP, poppler data, unzip utility)
+    libgomp1 \
+    poppler-data \
+    unzip \
     ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
@@ -48,9 +52,8 @@ WORKDIR /workspace
 # Copy only requirements at build time to leverage caching
 COPY requirements.txt /workspace/requirements.txt
 
-# Install Python requirements (some packages like paddlepaddle/paddleocr may require special wheels)
-RUN python3 -m pip install --no-cache-dir -r /workspace/requirements.txt || \
-    (echo "One or more packages failed to install during build. You can still run the container and install interactively." && exit 0)
+# Install Python requirements (paddlepaddle/paddleocr, faiss-cpu, etc.)
+RUN python3 -m pip install --no-cache-dir -r /workspace/requirements.txt
 
 # Install CPU PyTorch as a common dependency for sentence-transformers; if user prefers GPU, they should install appropriate CUDA wheels
 RUN python3 -m pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu || true

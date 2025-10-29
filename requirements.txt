@@ -12,7 +12,12 @@ rapidfuzz>=3.9
 tiktoken>=0.7
 matplotlib
 
+# model
 faiss-cpu
 pyarrow
 fastparquet
 sentence-transformers
+
+# webapp
+streamlit
+streamlit-llm

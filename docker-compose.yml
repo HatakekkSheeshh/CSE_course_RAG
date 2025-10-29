@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   app:
     build: .
@@ -9,4 +8,4 @@ services:
     tty: true
     stdin_open: true
     ports:
-      "8000:8000"
+      - "8000:8000"

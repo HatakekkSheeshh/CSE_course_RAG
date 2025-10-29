@@ -215,18 +215,17 @@ __marimo__/
 # Streamlit
 .streamlit/secrets.toml
 
-./data_cvt
-data_cvt/
-data_cvt
-
 ./data
-data/
-data
-
 ./cache
+./vscode    
+./test_feature
+data/
 cache/
+test_feature/
+data
 cache
-
+test_feature
 note.txt
 .vscode
-./vscode    
+
+

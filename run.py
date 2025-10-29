@@ -29,6 +29,7 @@ def now_iso(tz_name: str | None = "Asia/Ho_Chi_Minh") -> str:
     return datetime.now(tz).isoformat(timespec="seconds")
 
 ROOT = Path(__file__).resolve().parent
+ROOT_data = ROOT / "data"
 
 # ---------------------------------------------------------------------
 # Small helper to find child dir case-insensitively
@@ -41,7 +42,7 @@ def _find_child_dir_casefold(parent: Path, name_cf: str) -> Optional[Path]:
 # ---------------------------------------------------------------------
 # Collect syllabus images grouped by course (under data_cvt/<COURSE>/Syllabus/**)
 def collect_syllabus_images_by_course(root: Path) -> Dict[Path, List[Path]]:
-    data_cvt = root / "data_cvt"
+    data_cvt = root / "converted"
     image_exts = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tif", ".tiff"}
     out: Dict[Path, List[Path]] = {}
 
@@ -77,7 +78,7 @@ def pipeline_ocr_and_extract(data_root: Path, data_cvt_root: Path):
         return
 
     print("Detecting (OCR).")
-    out_dir = ROOT / "scratch"  # debug artifacts
+    out_dir = ROOT_data / "scratch" 
     detector = OCRTextDetector(out_dir=str(out_dir))
 
     total_images = 0
@@ -97,7 +98,7 @@ def pipeline_ocr_and_extract(data_root: Path, data_cvt_root: Path):
                 src_file=img_path,
                 items=items,
                 plain_text=plain_text,
-                annotated_image=ROOT / "scratch" / "annotated.png",
+                annotated_image=ROOT_data / "scratch" / "annotated.png",
                 copy_source_image=True,
                 data_root=data_root,
                 data_cvt_root=data_cvt_root,
@@ -159,14 +160,14 @@ def pipeline_merge_all(data_root: Path, out_root: Path, only_course: Optional[st
 
 def main():
     ap = argparse.ArgumentParser(description="Syllabus pipeline: Convert -> OCR/Extract -> Merge")
-    ap.add_argument("--convert", action="store_true", help="Run PDF-to-image conversion into data_cvt")
+    ap.add_argument("--convert", action="store_true", help="Run PDF-to-image conversion into data/converted")
     ap.add_argument("--ocr", action="store_true", help="Run OCR & extraction -> data/<course>/syllabus/parsed")
-    ap.add_argument("--merge", action="store_true", help="Merge parsed/*.syllabus.json -> data_processed")
+    ap.add_argument("--merge", action="store_true", help="Merge parsed/*.syllabus.json -> data/processed")
     ap.add_argument("--only-course", default=None, help="Process only one course (folder name under data/)")
-    ap.add_argument("--data-root", default=str(ROOT / "data"), help="Root directory for parsed outputs (default: ./data)")
-    ap.add_argument("--data-cvt-root", default=str(ROOT / "data_cvt"), help="Root directory for converted images (default: ./data_cvt)")
-    ap.add_argument("--data-raw", default=str(ROOT / "data_raw"), help="Root directory for raw inputs (PDFs, etc.) (default: ./data_raw)")
-    ap.add_argument("--out-root", default=str(ROOT / "data_processed"), help="Output directory for merged artifacts (default: ./data_processed)")
+    ap.add_argument("--data-root", default=str(ROOT_data / "data"), help="Root directory for parsed outputs (default: ./data)")
+    ap.add_argument("--data-cvt-root", default=str(ROOT_data / "converted"), help="Root directory for converted images (default: ./converted)")
+    ap.add_argument("--data-raw", default=str(ROOT_data / "raw"), help="Root directory for raw inputs (PDFs, etc.) (default: ./raw)")
+    ap.add_argument("--out-root", default=str(ROOT_data / "processed"), help="Output directory for merged artifacts (default: ./processed)")
     ap.add_argument("--dpi", type=int, default=220, help="DPI used for PDF-to-image conversion (default: 220)")
 
     args = ap.parse_args()
