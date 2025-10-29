@@ -52,14 +52,14 @@ def save_ocr_result(
 
     base = src_file.stem
 
-    # (1) Optionally copy the original image to images/
+    # Optionally copy the original image to images/
     saved_image = None
     if copy_source_image and src_file.exists():
         dst_img = _unique_path(layout.images, src_file.name)
         shutil.copy2(src_file, dst_img)
         saved_image = str(dst_img)
 
-    # (2) Save the OCR JSON payload
+    # Save the OCR JSON payload
     ocr_payload = {
         "meta": {
             "source_path": str(src_file),
@@ -73,14 +73,14 @@ def save_ocr_result(
         json.dumps(ocr_payload, ensure_ascii=False, indent=2), encoding="utf-8"
     )
 
-    # (3) Save flattened text (optional)
+    # Save flattened text (optional)
     saved_txt = None
     if plain_text is not None:
         dst_txt = _unique_path(layout.text, f"{base}.txt")
         Path(dst_txt).write_text(plain_text, encoding="utf-8")
         saved_txt = str(dst_txt)
 
-    # (4) Save annotated image (optional)
+    # Save annotated image (optional)
     saved_anno = None
     if annotated_image and Path(annotated_image).exists():
         anno = Path(annotated_image)
@@ -88,7 +88,7 @@ def save_ocr_result(
         shutil.copy2(anno, dst_anno)
         saved_anno = str(dst_anno)
 
-    # (5) Update manifest for traceability
+    # Update manifest for traceability
     update_manifest(
         {
             "course": layout.course_name,

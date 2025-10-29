@@ -15,7 +15,7 @@ from preprocessing.path_process.merge_parsed import merge_folder, save_outputs
 
 from datetime import datetime, timezone
 try:
-    from zoneinfo import ZoneInfo  # Python 3.9+
+    from zoneinfo import ZoneInfo 
 except ImportError:
     ZoneInfo = None
 
@@ -72,12 +72,12 @@ def pipeline_convert(data_raw: Path, data_cvt: Path, dpi: int = 220):
     )
 
 def pipeline_ocr_and_extract(data_root: Path, data_cvt_root: Path):
-    images_by_course = collect_syllabus_images_by_course(ROOT)  
+    images_by_course = collect_syllabus_images_by_course(ROOT_data)  
     if not images_by_course:
         print("No Syllabus images found under data_cvt/<COURSE_DIR>/Syllabus/. Nothing to do.")
         return
 
-    print("Detecting (OCR).")
+    print("Detecting (OCR)")
     out_dir = ROOT_data / "scratch" 
     detector = OCRTextDetector(out_dir=str(out_dir))
 
