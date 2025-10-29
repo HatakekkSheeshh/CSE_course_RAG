@@ -216,6 +216,7 @@ __marimo__/
 .streamlit/secrets.toml
 
 ./data
+./.windsurf
 ./cache
 ./vscode    
 ./test_feature
@@ -227,5 +228,5 @@ cache
 test_feature
 note.txt
 .vscode
-
+.windsurf
 

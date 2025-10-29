@@ -4,13 +4,17 @@ import json
 import argparse
 from dataclasses import asdict
 from typing import Dict, List, Optional, Any
-
+import re   
 from preprocessing.img_process.convert_data_to_img import convert_chapters_and_syllabus_to_images_parallel
 from preprocessing.dectector import OCRTextDetector
 from preprocessing.syllabus.extract_syllabus import syllabus
 
 from preprocessing.path_process.organize import save_ocr_result
 from preprocessing.path_process.pathing import extract_course_name
+from preprocessing.material.extract_material import (
+    extract_titles_from_items,
+    save_material,
+)
 from preprocessing.path_process.merge_parsed import merge_folder, save_outputs
 
 from datetime import datetime, timezone
@@ -40,27 +44,92 @@ def _find_child_dir_casefold(parent: Path, name_cf: str) -> Optional[Path]:
     return None
 
 # ---------------------------------------------------------------------
+
 # Collect syllabus images grouped by course (under data_cvt/<COURSE>/Syllabus/**)
-def collect_syllabus_images_by_course(root: Path) -> Dict[Path, List[Path]]:
+def collect_images_by_course(root: Path, kind: str = "syllabus") -> Dict[Path, List[Path]]:
+    """
+    Scan the data/converted directory and collect slide images grouped by course.
+
+    Behavior depends on `kind`:
+
+    - kind="syllabus":
+        returns { <course_dir>: [all images under Syllabus/**] }
+
+    - kind="material":
+        returns { <course_dir>: [all images under every Chapter_*/** for that course] }
+    """
+
     data_cvt = root / "converted"
+
+    # Allowed image extensions
     image_exts = {".png", ".jpg", ".jpeg", ".webp", ".bmp", ".tif", ".tiff"}
+
+    # Final result:
+    # { course_dir: [list of image Paths in order] }
     out: Dict[Path, List[Path]] = {}
 
     if not data_cvt.is_dir():
         return out
 
+    def _chapter_sort_key(p: Path) -> int:
+        """
+        Extract numeric chapter index from folder name like 'Chapter_7' -> 7.
+        If it can't be parsed, return a very large number so it goes last.
+        This prevents Chapter_10 from appearing before Chapter_2.
+        """
+        m = re.search(r"chapter[_\-\s]*(\d+)", p.name.casefold())
+        return int(m.group(1)) if m else 10**9
+
+    # Iterate each course directory under converted/
     for course_dir in sorted([p for p in data_cvt.iterdir() if p.is_dir()]):
-        syllabus_dir = _find_child_dir_casefold(course_dir, "syllabus")
-        if syllabus_dir is None:
-            continue
+        if kind.casefold() == "syllabus":
+            # Find "Syllabus" directory inside the course directory (case-insensitive)
+            syllabus_dir = _find_child_dir_casefold(course_dir, "syllabus")
+            if syllabus_dir is None:
+                continue
 
-        imgs = [p for p in syllabus_dir.rglob("*")
-                if p.is_file() and p.suffix.lower() in image_exts]
-        if imgs:
-            out[course_dir] = sorted(imgs)
+            imgs = [
+                p for p in syllabus_dir.rglob("*")
+                if p.is_file() and p.suffix.lower() in image_exts
+            ]
+
+            if imgs:
+                # Sort images by filename for stable order
+                imgs_sorted = sorted(imgs, key=lambda p: p.name.casefold())
+                out[course_dir] = imgs_sorted
+
+        elif kind.casefold() == "material":
+            # Find all chapter folders: Chapter_0, Chapter_1, ...
+            chapter_dirs = [
+                d for d in course_dir.iterdir()
+                if d.is_dir() and d.name.casefold().startswith("chapter")
+            ]
+
+            if not chapter_dirs:
+                continue
+
+            chapter_dirs_sorted = sorted(chapter_dirs, key=_chapter_sort_key)
+
+            imgs_all: List[Path] = []
+
+            for ch in chapter_dirs_sorted:
+                # Collect all images inside each Chapter_X folder
+                ch_imgs = [
+                    p for p in ch.rglob("*")
+                    if p.is_file() and p.suffix.lower() in image_exts
+                ]
+
+                ch_imgs_sorted = sorted(ch_imgs, key=lambda p: p.name.casefold())
+                imgs_all.extend(ch_imgs_sorted)
+
+            if imgs_all:
+                out[course_dir] = imgs_all
+
+        else:
+            # Invalid mode -> ignore
+            pass
+
     return out
-
-
 
 # =========================== PIPELINES =================================
 
@@ -74,20 +143,20 @@ def pipeline_convert(data_raw: Path, data_cvt: Path, dpi: int = 220):
 def pipeline_ocr_and_extract(data_root: Path, data_cvt_root: Path):
     images_by_course = collect_syllabus_images_by_course(ROOT_data)  
     if not images_by_course:
-        print("No Syllabus images found under data_cvt/<COURSE_DIR>/Syllabus/. Nothing to do.")
+        print("[DETECT] No Syllabus images found under data_cvt/<COURSE_DIR>/Syllabus/. Nothing to do.")
         return
 
-    print("Detecting (OCR)")
+    print("[DETECT] Detecting (OCR)")
     out_dir = ROOT_data / "scratch" 
     detector = OCRTextDetector(out_dir=str(out_dir))
 
     total_images = 0
     for course_dir, images in images_by_course.items():
         course_name = extract_course_name(course_dir.name)
-        print(f"\n\n=== Course: {course_name}  ({course_dir}) ===")
+        print(f"=== Course: {course_name}  ({course_dir}) ===")
         processed = 0
         for img_path in images:
-            print(f"--- Processing image: {img_path.name}")
+            print(f"Processing image: {img_path.name}")
             if not img_path.exists():
                 continue
 
@@ -131,9 +200,9 @@ def pipeline_ocr_and_extract(data_root: Path, data_cvt_root: Path):
             processed += 1
             total_images += 1
 
-        print(f"--- Done course: {course_name} | images processed: {processed}")
+        print(f"Done course: {course_name} | images processed: {processed}\n")
 
-    print(f"\nAll done. Total images processed: {total_images}")
+    print(f"All done. Total images processed: {total_images}")
 
 def pipeline_merge_all(data_root: Path, out_root: Path, only_course: Optional[str] = None):
     for course_dir in sorted(p for p in (data_root).iterdir() if p.is_dir()):
@@ -156,6 +225,42 @@ def pipeline_merge_all(data_root: Path, out_root: Path, only_course: Optional[st
         out_dir = out_root / course_slug
         save_outputs(merged, out_dir, name=f"{course_slug}")
 
+def pipeline_extract_material(data_root: Path):
+    """
+    Aggregate titles per course from syllabus OCR JSONs.
+
+    Reads: data/<course>/syllabus/ocr_json/*.ocr.json
+    Writes: data/<course>/material/material.json
+    """
+    images_by_course = collect_images_by_course(ROOT_data, kind="material")  
+    if not images_by_course:
+        print("[DETECT] No Material images found under data_cvt/<COURSE_DIR>/Material/. Nothing to do.")
+        return
+    """
+    for course_dir in sorted(p for p in (data_root).iterdir() if p.is_dir()):
+        material_dir = course_dir / "material"
+        if not material_dir.exists():
+            continue
+        course_name = course_dir.name
+        print(f"[MATERIAL] Course: {course_name}")
+
+        all_items = []
+        json_files = sorted(syllabus_ocr.glob("*.ocr.json"))
+        for idx, jf in enumerate(json_files):
+            try:
+                payload = json.loads(jf.read_text(encoding="utf-8"))
+            except Exception:
+                continue
+            items = payload.get("items") or []
+            titles = extract_titles_from_items(items, page_index=idx)
+            all_items.extend(titles)
+
+        material_dir = course_dir / "material"
+        out_path = material_dir / "material.json"
+        save_material(course_name, all_items, out_path)
+        print(f"[MATERIAL] Saved {len(all_items)} items -> {out_path}")
+    """
+
 # ============================== CLI ====================================
 
 def main():
@@ -163,6 +268,7 @@ def main():
     ap.add_argument("--convert", action="store_true", help="Run PDF-to-image conversion into data/converted")
     ap.add_argument("--ocr", action="store_true", help="Run OCR & extraction -> data/<course>/syllabus/parsed")
     ap.add_argument("--merge", action="store_true", help="Merge parsed/*.syllabus.json -> data/processed")
+    ap.add_argument("--material", action="store_true", help="Extract chapter titles -> data/<course>/material/material.json")
     ap.add_argument("--only-course", default=None, help="Process only one course (folder name under data/)")
     ap.add_argument("--data-root", default=str(ROOT_data / "data"), help="Root directory for parsed outputs (default: ./data)")
     ap.add_argument("--data-cvt-root", default=str(ROOT_data / "converted"), help="Root directory for converted images (default: ./converted)")
@@ -177,6 +283,16 @@ def main():
     data_raw = Path(args.data_raw)
     out_root = Path(args.out_root)
 
+    # Ensure required directories exist; create them if missing
+    for d in [data_root, data_cvt_root, data_raw, out_root]:
+        if not d.exists():
+            try:
+                d.mkdir(parents=True, exist_ok=True)
+                print(f"[INIT] Created missing directory: {d}")
+            except Exception as e:
+                print(f"Error: failed to create directory {d}: {e}")
+                return
+
     if args.convert:
         pipeline_convert(data_raw=data_raw, data_cvt=data_cvt_root, dpi=args.dpi)
 
@@ -185,6 +301,9 @@ def main():
 
     if args.merge:
         pipeline_merge_all(data_root=data_root, out_root=out_root, only_course=args.only_course)
+
+    if args.material:
+        pipeline_extract_material(data_root=data_root)
 
 if __name__ == "__main__":
     main()

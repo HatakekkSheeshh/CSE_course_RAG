@@ -28,15 +28,9 @@ class AssessmentComponent:
     evaluation_type: List[EvaluationType] = field(default_factory=list)
 
 @dataclass
-class CourseDescription:
-    description: Optional[str] = None
-    material: Optional[str] = None
-
-@dataclass
-class SyllabusV1:
+class Syllabus:
     schema_version: Literal["syllabus.v1"] = "syllabus.v1"
     metadata: Metadata = field(default_factory=Metadata)
     course_info: CourseInfo = field(default_factory=CourseInfo)
     assessments: List[AssessmentComponent] = field(default_factory=list)
-    course_des: CourseDescription = field(default_factory=CourseDescription)
-    raw_ocr_text: Optional[str] = None
+    raw_text: Optional[str] = None

@@ -7,21 +7,15 @@ from __future__ import annotations
 
 import re
 from typing import List, Dict, Any, Optional, Tuple
-import unicodedata
-
 from preprocessing.syllabus.regex import RX
-
+from preprocessing.manifest import Metadata
 from preprocessing.syllabus.syllabus import (
-        EvaluationType, AssessmentComponent, CourseInfo, CourseDescription, SyllabusV1
+        EvaluationType, AssessmentComponent, CourseInfo, Syllabus
     )
 
-try:
-    from preprocessing.manifest import Metadata
-except Exception:
-    class Metadata:  # type: ignore
-        def __init__(self, **kwargs):
-            for k, v in kwargs.items():
-                setattr(self, k, v)
+
+
+
 
 # ---------------------------------------------------------------------------
 def records(items: List[Dict[str, Any]]):
@@ -420,8 +414,6 @@ def extract(items: List[Dict[str, Any]]) -> Tuple[CourseInfo, List]:
                         if rows[i] == ass.name.lower():
                             ass.ratio = _to_int(ratio)
 
-
-
     return ci, asses
 
 # Public wrapper
@@ -433,9 +425,9 @@ def syllabus(
     ocr_engine: str = "ppocrv3",
     extractor_version: str = "1.2.0",
     timestamp: Optional[str] = None,
-    raw_ocr_text: Optional[str] = None,
+    raw_text: Optional[str] = None,
     **kwargs,
-) -> SyllabusV1:
+) -> Syllabus:
 
     ci, asses = extract(items)
 
@@ -455,11 +447,10 @@ def syllabus(
         timestamp=timestamp,
     )
 
-    return SyllabusV1(
+    return Syllabus(
         schema_version="syllabus.v1",
         metadata=meta,
         course_info=ci,
         assessments=asses,
-        course_des=CourseDescription(),
-        raw_ocr_text=raw_ocr_text,
+        raw_text=raw_text,
     )

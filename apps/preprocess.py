@@ -28,10 +28,6 @@ def render(
                     "--convert",
                     "--dpi",
                     str(dpi),
-                    "--data-raw",
-                    data_raw,
-                    "--data-cvt-root",
-                    data_cvt,
                 ]
                 code, _ = run_cmd(cmd)
                 if code == 0:
@@ -47,10 +43,6 @@ def render(
                     python_bin(),
                     "run.py",
                     "--ocr",
-                    "--data-root",
-                    data_root / "data",
-                    "--data-cvt-root",
-                    data_cvt,
                 ]
                 code, _ = run_cmd(cmd)
                 if code == 0:
@@ -67,10 +59,6 @@ def render(
                     python_bin(),
                     "run.py",
                     "--merge",
-                    "--data-root",
-                    data_root,
-                    "--out-root",
-                    out_root,
                 ]
                 if only_course.strip():
                     cmd += ["--only-course", only_course.strip()]
