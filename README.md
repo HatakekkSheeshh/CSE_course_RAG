@@ -17,12 +17,12 @@ Convert course documents to images, extract syllabus content with OCR, and produ
 ## Architecture
 
 ```mermaid
-flowchart LR
-    A["Raw Docs (PDF/Office)"] -->|Convert| B["Images per Course"]
-    B -->|OCR| C["Page OCR JSON"]
-    C -->|Parse| D["Page Syllabus JSON"]
-    D -->|Merge| E["Course Outputs (processed/)"]
-    E -->|Explore| F["Streamlit Demo"]
+graph LR
+  A["Raw Docs (PDF/Office)"] -- Convert --> B["Images per Course"]
+  B -- OCR --> C["Page OCR JSON"]
+  C -- Parse --> D["Page Syllabus JSON"]
+  D -- Merge --> E["Course Outputs (processed/)"]
+  E -- Explore --> F["Streamlit Demo"]
 ```
 
 ---
