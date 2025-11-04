@@ -17,7 +17,7 @@ Convert course documents to images, extract syllabus content with OCR, and produ
 ## Architecture
 
 ```mermaid
-flowchart LR
+graph LR
   A[Raw Docs (PDF/Office)] -->|Convert| B[Images per Course]
   B -->|OCR| C[Page OCR JSON]
   C -->|Parse| D[Page Syllabus JSON]
