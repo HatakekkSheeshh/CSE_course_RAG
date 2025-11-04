@@ -1,3 +1,10 @@
+from __future__ import annotations
+from pathlib import Path
+import shutil
+import json
+from typing import Optional, Dict, Any
+from .pathing import ensure_layout_for_source, update_manifest
+
 """
 Store OCR outputs into the normalized syllabus layout:
 
@@ -9,13 +16,6 @@ Store OCR outputs into the normalized syllabus layout:
 
 Returns a dict with the saved paths (as strings).
 """
-
-from __future__ import annotations
-from pathlib import Path
-import shutil
-import json
-from typing import Optional, Dict, Any
-from .pathing import ensure_layout_for_source, update_manifest
 
 def _unique_path(target_dir: Path, filename: str) -> Path:
     """

@@ -17,6 +17,11 @@ faiss-cpu
 pyarrow
 fastparquet
 sentence-transformers
+tqdm
+scikit-learn
 
 # webapp
 streamlit
+
+# optional: qdrant support
+qdrant-client

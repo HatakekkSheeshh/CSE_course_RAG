@@ -4,18 +4,20 @@ import json
 import argparse
 from dataclasses import asdict
 from typing import Dict, List, Optional, Any
-import re   
+import re
+import numpy as np   
 from preprocessing.img_process.convert_data_to_img import convert_chapters_and_syllabus_to_images_parallel
 from preprocessing.dectector import OCRTextDetector
 from preprocessing.syllabus.extract_syllabus import syllabus
 
 from preprocessing.path_process.organize import save_ocr_result
-from preprocessing.path_process.pathing import extract_course_name
-from preprocessing.material.extract_material import (
-    extract_titles_from_items,
-    save_material,
-)
+from preprocessing.path_process.pathing import extract_course_name, extract_course_id 
+from preprocessing.material.extract_material import material, save_material
 from preprocessing.path_process.merge_parsed import merge_folder, save_outputs
+from preprocessing.indexing_pipeline import build_indices_for_all_courses
+from models.embedding import Embedding
+from models.debug_utils import debug_index_from_path, test_search
+from models.indexing import load_index
 
 from datetime import datetime, timezone
 try:
@@ -141,7 +143,7 @@ def pipeline_convert(data_raw: Path, data_cvt: Path, dpi: int = 220):
     )
 
 def pipeline_ocr_and_extract(data_root: Path, data_cvt_root: Path):
-    images_by_course = collect_syllabus_images_by_course(ROOT_data)  
+    images_by_course = collect_images_by_course(ROOT_data, kind="syllabus")  
     if not images_by_course:
         print("[DETECT] No Syllabus images found under data_cvt/<COURSE_DIR>/Syllabus/. Nothing to do.")
         return
@@ -227,53 +229,186 @@ def pipeline_merge_all(data_root: Path, out_root: Path, only_course: Optional[st
 
 def pipeline_extract_material(data_root: Path):
     """
-    Aggregate titles per course from syllabus OCR JSONs.
-
-    Reads: data/<course>/syllabus/ocr_json/*.ocr.json
+    Aggregate chapter titles per course from slide images (Chapter_*).
     Writes: data/<course>/material/material.json
     """
-    images_by_course = collect_images_by_course(ROOT_data, kind="material")  
+    images_by_course = collect_images_by_course(ROOT_data, kind="material")
     if not images_by_course:
-        print("[DETECT] No Material images found under data_cvt/<COURSE_DIR>/Material/. Nothing to do.")
+        print("[MATERIAL] No Chapter_* images found. Nothing to do.")
         return
-    """
-    for course_dir in sorted(p for p in (data_root).iterdir() if p.is_dir()):
-        material_dir = course_dir / "material"
-        if not material_dir.exists():
+
+    detector = OCRTextDetector(out_dir=str(data_root / "scratch"))
+
+    for course_dir, images in images_by_course.items():
+        course_name = extract_course_name(course_dir.name)
+        course_id = extract_course_id(course_dir.name)
+
+        print(f"[MATERIAL] Course: {course_name} ({course_id})")
+
+        mats: List[Material] = []
+
+        if Path(data_root / course_name / "material").exists():
+            print("[MATERIAL] Material already exists. Skipping.")
             continue
-        course_name = course_dir.name
-        print(f"[MATERIAL] Course: {course_name}")
 
-        all_items = []
-        json_files = sorted(syllabus_ocr.glob("*.ocr.json"))
-        for idx, jf in enumerate(json_files):
-            try:
-                payload = json.loads(jf.read_text(encoding="utf-8"))
-            except Exception:
+        for idx, img_path in enumerate(images):
+            if not img_path.exists():
+                print("Not exist")
                 continue
-            items = payload.get("items") or []
-            titles = extract_titles_from_items(items, page_index=idx)
-            all_items.extend(titles)
+            print("[INDEX] {}".format(idx))
 
-        material_dir = course_dir / "material"
-        out_path = material_dir / "material.json"
-        save_material(course_name, all_items, out_path)
-        print(f"[MATERIAL] Saved {len(all_items)} items -> {out_path}")
+            ocr_items = detector.predict(str(img_path))
+
+            raw_text = " ".join(
+                [it.get("text", "") for it in ocr_items if it.get("text")]
+            )
+
+            mat = material(
+                ocr_items,
+                source_file=str(img_path),
+                page_index=idx,          # index of this slide within the chapter
+                course_name=course_name,
+                course_id=course_id,
+                language="en",
+                ocr_engine="PaddleOCR 3.2",
+                extractor_version="1.0.0",
+                timestamp=now_iso(),
+                raw_ocr_text=raw_text,
+            )
+
+            mats.append(mat)
+
+        out_dir = data_root / course_name / "material"
+        out_path = out_dir / "material.json"
+
+        save_material(
+            course_name=course_name,
+            course_id=course_id,
+            mats=mats,
+            out_path=out_path,
+        )
+
+        print(f"[MATERIAL] Saved {len(mats)} slides -> {out_path}\n")
+
+
+def pipeline_index(
+    data_root: Path,
+    index_dir: Path,
+    chunk_size: int = 512,
+    overlap: int = 50,
+    embedding_dim: int = 384,
+    batch_size: int = 32,
+    only_course: Optional[str] = None
+):
     """
+    Build FAISS indices for all courses.
+    
+    Args:
+        data_root: Root directory containing course data
+        index_dir: Directory to save indices
+        chunk_size: Chunk size in tokens (default: 512)
+        overlap: Overlap size in tokens (default: 50)
+        embedding_dim: Embedding dimension (default: 384)
+        batch_size: Batch size for embedding generation (default: 32)
+        only_course: If specified, only index this course
+    """
+    print("[INDEX] Initializing embedding model...")
+    embedding_model = Embedding()
+    
+    print("[INDEX] Building indices...")
+    results = build_indices_for_all_courses(
+        data_root=data_root,
+        index_base_dir=index_dir,
+        embedding_model=embedding_model,
+        embedding_dim=embedding_dim,
+        chunk_size=chunk_size,
+        overlap=overlap,
+        batch_size=batch_size,
+        only_course=only_course
+    )
+    
+    # Print summary
+    print("\n[INDEX] Summary:")
+    total_chunks = sum(r.get("chunks", 0) for r in results)
+    total_vectors = sum(r.get("vectors", 0) for r in results)
+    successful = sum(1 for r in results if r.get("status") == "success")
+    
+    print(f"  Courses processed: {len(results)}")
+    print(f"  Successful: {successful}")
+    print(f"  Total chunks: {total_chunks}")
+    print(f"  Total vectors: {total_vectors}")
+    
+    for result in results:
+        status = result.get("status", "unknown")
+        course = result.get("course", "unknown")
+        if status == "success":
+            chunks = result.get("chunks", 0)
+            vectors = result.get("vectors", 0)
+            print(f"  ✓ {course}: {chunks} chunks, {vectors} vectors")
+        else:
+            print(f"  ✗ {course}: {status}")
+
+
+def pipeline_debug_index(
+    index_dir: Path,
+    course_name: Optional[str] = None,
+    query_text: Optional[str] = None,
+    k: int = 5
+):
+    """
+    Debug existing FAISS indices.
+    
+    Args:
+        index_dir: Directory containing indices
+        course_name: Specific course to debug (if None, debug all)
+        query_text: Optional query text to test search
+        k: Number of search results
+    """
+    if course_name:
+        course_dirs = [index_dir / course_name] if (index_dir / course_name).exists() else []
+    else:
+        course_dirs = [d for d in index_dir.iterdir() if d.is_dir() and (d / "index.faiss").exists()]
+    
+    if not course_dirs:
+        print(f"[DEBUG] No indices found in {index_dir}")
+        return
+    
+    for course_dir in sorted(course_dirs):
+        print(f"\n[DEBUG] Debugging index: {course_dir.name}")
+        try:
+            debug_index_from_path(course_dir, visualize=False)
+            
+            # Test search if query provided
+            if query_text:
+                print(f"\n[DEBUG] Testing search with query: '{query_text}'")
+                index, metadata_map = load_index(course_dir)
+                embedding_model = Embedding()
+                query_embedding = np.array(embedding_model.embed(query_text), dtype='float32')
+                test_search(index, query_embedding, metadata_map, k=k, verbose=True)
+        except Exception as e:
+            print(f"[DEBUG] Error debugging {course_dir.name}: {e}")
+
 
 # ============================== CLI ====================================
 
 def main():
     ap = argparse.ArgumentParser(description="Syllabus pipeline: Convert -> OCR/Extract -> Merge")
     ap.add_argument("--convert", action="store_true", help="Run PDF-to-image conversion into data/converted")
-    ap.add_argument("--ocr", action="store_true", help="Run OCR & extraction -> data/<course>/syllabus/parsed")
+    ap.add_argument("--syllabus", action="store_true", help="Run OCR & extraction -> data/<course>/syllabus/parsed")
     ap.add_argument("--merge", action="store_true", help="Merge parsed/*.syllabus.json -> data/processed")
     ap.add_argument("--material", action="store_true", help="Extract chapter titles -> data/<course>/material/material.json")
+    ap.add_argument("--index", action="store_true", help="Build FAISS indices for chunked documents -> data/indices")
+    ap.add_argument("--debug-index", action="store_true", help="Debug existing FAISS indices")
+    ap.add_argument("--test-query", default=None, help="Test search with query text (use with --debug-index)")
     ap.add_argument("--only-course", default=None, help="Process only one course (folder name under data/)")
     ap.add_argument("--data-root", default=str(ROOT_data / "data"), help="Root directory for parsed outputs (default: ./data)")
     ap.add_argument("--data-cvt-root", default=str(ROOT_data / "converted"), help="Root directory for converted images (default: ./converted)")
     ap.add_argument("--data-raw", default=str(ROOT_data / "raw"), help="Root directory for raw inputs (PDFs, etc.) (default: ./raw)")
     ap.add_argument("--out-root", default=str(ROOT_data / "processed"), help="Output directory for merged artifacts (default: ./processed)")
+    ap.add_argument("--index-dir", default=str(ROOT_data / "indices"), help="Output directory for FAISS indices (default: ./indices)")
+    ap.add_argument("--chunk-size", type=int, default=512, help="Chunk size in tokens for indexing (default: 512)")
+    ap.add_argument("--chunk-overlap", type=int, default=50, help="Overlap size in tokens between chunks (default: 50)")
+    ap.add_argument("--batch-size", type=int, default=32, help="Batch size for embedding generation (default: 32)")
     ap.add_argument("--dpi", type=int, default=220, help="DPI used for PDF-to-image conversion (default: 220)")
 
     args = ap.parse_args()
@@ -282,9 +417,14 @@ def main():
     data_cvt_root = Path(args.data_cvt_root)
     data_raw = Path(args.data_raw)
     out_root = Path(args.out_root)
+    index_dir = Path(args.index_dir)
 
     # Ensure required directories exist; create them if missing
-    for d in [data_root, data_cvt_root, data_raw, out_root]:
+    dirs_to_check = [data_root, data_cvt_root, data_raw, out_root]
+    if args.index:
+        dirs_to_check.append(index_dir)
+    
+    for d in dirs_to_check:
         if not d.exists():
             try:
                 d.mkdir(parents=True, exist_ok=True)
@@ -296,7 +436,7 @@ def main():
     if args.convert:
         pipeline_convert(data_raw=data_raw, data_cvt=data_cvt_root, dpi=args.dpi)
 
-    if args.ocr:
+    if args.syllabus:
         pipeline_ocr_and_extract(data_root=data_root, data_cvt_root=data_cvt_root)
 
     if args.merge:
@@ -304,6 +444,24 @@ def main():
 
     if args.material:
         pipeline_extract_material(data_root=data_root)
+
+    if args.index:
+        pipeline_index(
+            data_root=data_root,
+            index_dir=index_dir,
+            chunk_size=args.chunk_size,
+            overlap=args.chunk_overlap,
+            batch_size=args.batch_size,
+            only_course=args.only_course
+        )
+    
+    if args.debug_index:
+        pipeline_debug_index(
+            index_dir=index_dir,
+            course_name=args.only_course,
+            query_text=args.test_query,
+            k=5
+        )
 
 if __name__ == "__main__":
     main()

@@ -1,3 +1,10 @@
+from __future__ import annotations
+from pathlib import Path
+import re
+import json
+from dataclasses import dataclass
+from typing import Optional, Dict
+
 """
 Preprocessing utilities for organizing course syllabus data.
 Store OCR outputs into the normalized syllabus layout:
@@ -7,13 +14,6 @@ Store OCR outputs into the normalized syllabus layout:
     - images/<original-name>           (if copy_source_image=True)
     - annotated/<name>                 (if annotated_image is provided)
 """
-
-from __future__ import annotations
-from pathlib import Path
-import re
-import json
-from dataclasses import dataclass
-from typing import Optional, Dict
 
 # Patterns to extract the <course name> from a course folder under data_cvt/
 # Examples matched:
@@ -47,6 +47,26 @@ def extract_course_name(course_dir_name: str) -> str:
         m = pat.match(course_dir_name)
         if m:
             return sanitize_folder_name(m.group("name"))
+    return sanitize_folder_name(course_dir_name)
+
+def extract_course_id(course_dir_name: str) -> str:
+    """
+    Infer the <course id / course code> from a course directory name.
+
+    Examples:
+        "CO2017_Operating_Systems"        -> "CO2017"
+        "Operating Systems (CO2017)"      -> "CO2017"
+
+    If no known pattern matches, we fall back to a sanitized version
+    of the original folder name (so the function is still total).
+    """
+
+    for pat in COURSE_DIR_PATTERNS:
+        m = pat.match(course_dir_name)
+        if m:
+            return sanitize_folder_name(m.group("code"))
+
+    # Fallback: no match, just sanitize the whole thing
     return sanitize_folder_name(course_dir_name)
 
 def find_course_root_in_datacvt(src: Path, data_cvt_root: Path) -> Optional[Path]:
