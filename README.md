@@ -240,6 +240,25 @@ to start Streamlit automatically, then run with `-f docker-compose.dev.yml`.
 
 ---
 
+## RAG System Completion Plan
+
+For a detailed implementation plan to complete the RAG system, see the comprehensive planning document:
+
+📋 **[RAG System Completion Plan](docs/rag-completion-plan.md)**
+
+This document includes:
+- Current progress assessment (~60% complete)
+- Detailed breakdown of completed vs. missing components
+- Phase-by-phase implementation guide (LLM Integration, RAG Pipeline, UI)
+- Step-by-step instructions for each component
+- Timeline and milestones (9-12 days to completion)
+- Testing & evaluation strategy
+- Code architecture and file structure
+
+The plan covers the remaining work needed to transform the current retrieval system into a complete RAG (Retrieval-Augmented Generation) system with LLM integration and user-facing interfaces.
+
+---
+
 ## License
 
 Specify your license here (e.g., MIT) if applicable.
