@@ -48,9 +48,10 @@ def inspect_embeddings(
     
     if verbose:
         print("\n[DEBUG] Embedding Statistics:")
-        print(f"  Shape: {stats['shape']}")
-        print(f"  Number of vectors: {stats['n_vectors']}")
-        print(f"  Embedding dimension: {stats['embedding_dim']}")
+        print(f"  Shape: {stats['shape']} (n_vectors, embedding_dim)")
+        print(f"  Number of vectors: {stats['n_vectors']} (chunks)")
+        print(f"  Embedding dimension: {stats['embedding_dim']} (fixed by model)")
+        print(f"  → Total elements: {stats['n_vectors']} × {stats['embedding_dim']} = {stats['n_vectors'] * stats['embedding_dim']:,}")
         print(f"  Mean value: {stats['mean']:.6f}")
         print(f"  Std value: {stats['std']:.6f}")
         print(f"  Min value: {stats['min']:.6f}")
@@ -76,7 +77,7 @@ def visualize_embedding_matrix(
         max_samples: Maximum number of samples to visualize
         figsize: Figure size (width, height)
     """
-    # Sample if too many vectors
+    # Constrain the number of samples to visualize (<= 100)
     if embeddings.shape[0] > max_samples:
         indices = np.random.choice(embeddings.shape[0], max_samples, replace=False)
         sample_embeddings = embeddings[indices]
@@ -121,7 +122,7 @@ def visualize_embeddings_2d(
         max_samples: Maximum number of samples to visualize
         figsize: Figure size
     """
-    # Sample if too many vectors
+    # Constrain the number of samples to visualize (<= 1000)
     if embeddings.shape[0] > max_samples:
         indices = np.random.choice(embeddings.shape[0], max_samples, replace=False)
         sample_embeddings = embeddings[indices]
@@ -188,12 +189,13 @@ def inspect_faiss_index(
     
     if verbose:
         print("\n[DEBUG] FAISS Index Statistics:")
-        print(f"  Total vectors: {stats['ntotal']}")
-        print(f"  Dimension: {stats['d']}")
+        print(f"  Total vectors: {stats['ntotal']} (should match embedding n_vectors)")
+        print(f"  Dimension: {stats['d']} (should match embedding_dim = 384)")
+        print(f"  → Total capacity: {stats['ntotal']} × {stats['d']} = {stats['ntotal'] * stats['d']:,} values")
         print(f"  Is trained: {stats['is_trained']}")
-        print(f"  Metric type: {stats['metric_type']}")
+        print(f"  Metric type: {stats['metric_type']} (1 = Inner Product / Cosine)")
         if metadata_map:
-            print(f"  Metadata entries: {stats['metadata_count']}")
+            print(f"  Metadata entries: {stats['metadata_count']} (should match n_vectors)")
     
     return stats
 

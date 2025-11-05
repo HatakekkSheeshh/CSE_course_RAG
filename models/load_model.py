@@ -1,12 +1,12 @@
 from sentence_transformers import SentenceTransformer
 from faiss import IndexFlatIP
 from paddleocr import PaddleOCR
+from typing import Optional
 
 """
-Demo: In development process
-Warning: Not in use
+Load model for different purposes
 """
-def load_model(kind: str = "ocr"):
+def load_model(kind: str = "ocr", embedding_dim: Optional[int] = None):
     if kind == "ocr":
         return PaddleOCR(
             lang="en",
@@ -17,7 +17,5 @@ def load_model(kind: str = "ocr"):
         )
     elif kind == "embed":
         return SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
-    elif kind == "index":
-        return IndexFlatIP(384) 
     else:
         raise ValueError(f"Unknown kind: {kind}")

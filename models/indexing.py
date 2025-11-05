@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import List, Dict, Tuple, Optional
 import json
 import numpy as np
+import faiss
 from faiss import IndexFlatIP
 from preprocessing.manifest import DocChunk
 
@@ -90,7 +91,7 @@ def save_index(
     
     # Save FAISS index
     index_path = path / "index.faiss"
-    IndexFlatIP.write_index(index, str(index_path))
+    faiss.write_index(index, str(index_path))
     
     # Save metadata map
     metadata_path = path / "metadata.json"
@@ -117,7 +118,7 @@ def load_index(path: Path) -> Tuple[IndexFlatIP, Dict[str, Dict]]:
         raise FileNotFoundError(f"Metadata file not found: {metadata_path}")
     
     # Load index
-    index = IndexFlatIP.read_index(str(index_path))
+    index = faiss.read_index(str(index_path))
     
     # Load metadata
     with open(metadata_path, 'r', encoding='utf-8') as f:

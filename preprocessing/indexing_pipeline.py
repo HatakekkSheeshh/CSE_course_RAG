@@ -10,6 +10,7 @@ from typing import List, Dict, Any, Optional
 import json
 import numpy as np
 from tqdm import tqdm
+from typing import Tuple
 
 from .chunking import chunk_syllabus, chunk_material
 from .manifest import DocChunk
