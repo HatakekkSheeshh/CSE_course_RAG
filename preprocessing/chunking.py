@@ -37,7 +37,7 @@ def chunk_text(
     encoding: Optional[tiktoken.Encoding] = None
 ) -> List[DocChunk]:
     """
-    Chunk text into overlapping segments.
+    Chunk text into overlapping segments based on actual token count.
     
     Args:
         text: Text to chunk
@@ -56,46 +56,95 @@ def chunk_text(
     chunks = []
     encoding = encoding or _get_encoding()
     
-    # Simple character-based chunking with overlap
-    # Approximate token count: 1 token ≈ 4 characters
-    char_chunk_size = chunk_size * 4
-    char_overlap = overlap * 4
-    
-    start = 0
-    chunk_idx = 0
-    
-    while start < len(text):
-        end = start + char_chunk_size
+    # If no encoding available, fall back to character-based approximation
+    if encoding is None:
+        # Fallback: approximate 1 token ≈ 4 characters
+        char_chunk_size = chunk_size * 4
+        char_overlap = overlap * 4
         
-        # Extract chunk
-        chunk_text_segment = text[start:end].strip()
+        start = 0
+        chunk_idx = 0
         
-        if chunk_text_segment:
-            chunk_id = f"{chunk_id_prefix}-{chunk_idx:04d}"
+        while start < len(text):
+            end = start + char_chunk_size
             
-            # Create chunk with same metadata
+            # Extract chunk
+            chunk_text_segment = text[start:end].strip()
+            
+            if chunk_text_segment:
+                chunk_id = f"{chunk_id_prefix}-{chunk_idx:04d}"
+                
+                # Create chunk with same metadata
+                chunk = DocChunk(
+                    id=chunk_id,
+                    text=chunk_text_segment,
+                    metadata=metadata
+                )
+                chunks.append(chunk)
+                chunk_idx += 1
+            
+            # Move start position with overlap
+            start = end - char_overlap
+            if start >= len(text):
+                break
+    else:
+        # Use actual token counting with tiktoken
+        # Encode entire text once for efficiency
+        tokens = encoding.encode(text)
+        
+        if len(tokens) <= chunk_size:
+            # Text fits in one chunk
+            chunk_id = f"{chunk_id_prefix}-0000"
             chunk = DocChunk(
                 id=chunk_id,
-                text=chunk_text_segment,
+                text=text.strip(),
                 metadata=metadata
             )
             chunks.append(chunk)
-            chunk_idx += 1
-        
-        # Move start position with overlap
-        start = end - char_overlap
-        if start >= len(text):
-            break
+        else:
+            # Chunk with overlap
+            chunk_idx = 0
+            start_token = 0
+            
+            while start_token < len(tokens):
+                end_token = start_token + chunk_size
+                
+                # Extract token range
+                chunk_tokens = tokens[start_token:end_token]
+                chunk_text_segment = encoding.decode(chunk_tokens).strip()
+                
+                if chunk_text_segment:
+                    chunk_id = f"{chunk_id_prefix}-{chunk_idx:04d}"
+                    
+                    # Create chunk with same metadata
+                    chunk = DocChunk(
+                        id=chunk_id,
+                        text=chunk_text_segment,
+                        metadata=metadata
+                    )
+                    chunks.append(chunk)
+                    chunk_idx += 1
+                
+                # Move start position with overlap
+                start_token = end_token - overlap
+                if start_token >= len(tokens):
+                    break
     
     return chunks
 
 
-def chunk_syllabus(syllabus_json: Dict[str, Any]) -> List[DocChunk]:
+def chunk_syllabus(
+    syllabus_json: Dict[str, Any],
+    chunk_size: int = 512,
+    overlap: int = 50
+) -> List[DocChunk]:
     """
     Chunk syllabus JSON into DocChunk objects.
     
     Args:
         syllabus_json: Parsed syllabus JSON dictionary
+        chunk_size: Chunk size in tokens (default: 512)
+        overlap: Overlap size in tokens (default: 50)
         
     Returns:
         List of DocChunk objects
@@ -134,7 +183,7 @@ def chunk_syllabus(syllabus_json: Dict[str, Any]) -> List[DocChunk]:
                 course_info_text,
                 base_metadata,
                 prefix,
-                chunk_size=256,  # Smaller chunks for structured info
+                chunk_size=128,  
                 overlap=25,
                 encoding=encoding
             ))
@@ -165,8 +214,8 @@ def chunk_syllabus(syllabus_json: Dict[str, Any]) -> List[DocChunk]:
                 assessment_full_text,
                 base_metadata,
                 prefix,
-                chunk_size=512,
-                overlap=50,
+                chunk_size=chunk_size,
+                overlap=overlap,
                 encoding=encoding
             ))
     
@@ -185,33 +234,39 @@ def chunk_syllabus(syllabus_json: Dict[str, Any]) -> List[DocChunk]:
                 desc_text,
                 base_metadata,
                 prefix,
-                chunk_size=512,
-                overlap=50,
+                chunk_size=chunk_size,
+                overlap=overlap,
                 encoding=encoding
             ))
     
     # Chunk raw OCR text (main content)
-    raw_text = syllabus_json.get("raw_ocr_text", "")
+    raw_text = syllabus_json.get("raw_ocr_text", "") or syllabus_json.get("raw_text", "")
     if raw_text and raw_text.strip():
         prefix = f"{course_id}-syllabus-raw"
         chunks.extend(chunk_text(
             raw_text,
             base_metadata,
             prefix,
-            chunk_size=512,
-            overlap=50,
+            chunk_size=chunk_size,
+            overlap=overlap,
             encoding=encoding
         ))
     
     return chunks
 
 
-def chunk_material(material_json: Dict[str, Any]) -> List[DocChunk]:
+def chunk_material(
+    material_json: Dict[str, Any],
+    chunk_size: int = 512,
+    overlap: int = 50
+) -> List[DocChunk]:
     """
     Chunk material JSON into DocChunk objects.
     
     Args:
         material_json: Parsed material JSON dictionary
+        chunk_size: Chunk size in tokens (default: 512)
+        overlap: Overlap size in tokens (default: 50)
         
     Returns:
         List of DocChunk objects
@@ -253,8 +308,8 @@ def chunk_material(material_json: Dict[str, Any]) -> List[DocChunk]:
             raw_text,
             base_metadata,
             prefix,
-            chunk_size=512,
-            overlap=50,
+            chunk_size=chunk_size,
+            overlap=overlap,
             encoding=encoding
         )
         

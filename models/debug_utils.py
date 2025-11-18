@@ -9,6 +9,7 @@ from typing import List, Dict, Tuple, Optional
 import numpy as np
 import json
 from faiss import IndexFlatIP
+import faiss
 import matplotlib.pyplot as plt
 from sklearn.decomposition import PCA
 from sklearn.manifold import TSNE
@@ -188,12 +189,30 @@ def inspect_faiss_index(
     }
     
     if verbose:
+        # Map metric type to name by comparing with reference IndexFlatIP
+        metric_type_val = int(stats['metric_type'])
+        reference_index = IndexFlatIP(stats['d'])
+        expected_metric_type = int(reference_index.metric_type)
+        
+        # Compare with reference to determine type
+        if metric_type_val == expected_metric_type:
+            metric_name = "Inner Product (Cosine when normalized)"
+            is_correct = True
+        else:
+            # Different metric type - likely L2
+            metric_name = "L2 (Euclidean Distance) or other"
+            is_correct = False
+        
         print("\n[DEBUG] FAISS Index Statistics:")
         print(f"  Total vectors: {stats['ntotal']} (should match embedding n_vectors)")
         print(f"  Dimension: {stats['d']} (should match embedding_dim = 384)")
         print(f"  → Total capacity: {stats['ntotal']} × {stats['d']} = {stats['ntotal'] * stats['d']:,} values")
         print(f"  Is trained: {stats['is_trained']}")
-        print(f"  Metric type: {stats['metric_type']} (1 = Inner Product / Cosine)")
+        print(f"  Metric type: {metric_type_val} ({metric_name})")
+        if not is_correct:
+            print(f"  ⚠️  WARNING: Expected metric_type={expected_metric_type} (IndexFlatIP), but got {metric_type_val}")
+            print(f"     This index may not work correctly with cosine similarity search!")
+            print(f"     Recommendation: Rebuild index using IndexFlatIP")
         if metadata_map:
             print(f"  Metadata entries: {stats['metadata_count']} (should match n_vectors)")
     

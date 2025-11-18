@@ -239,14 +239,7 @@ class OCRTextDetector:
     def predict_items(self, img_path: Path | str) -> List[Dict]:
         """
         Run OCR on image and return detected text items.
-        
-        Main OCR processing method that:
-            1. Loads and preprocesses image (if enabled)
-            2. Runs PaddleOCR detection/recognition
-            3. Converts results to standardized format
-            4. Filters by confidence threshold
-            5. Optionally saves results to output directory
-        
+
         Args:
             img_path: Path to input image file
         

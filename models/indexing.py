@@ -120,6 +120,19 @@ def load_index(path: Path) -> Tuple[IndexFlatIP, Dict[str, Dict]]:
     # Load index
     index = faiss.read_index(str(index_path))
     
+    # Validate index type (should be IndexFlatIP, not IndexFlatL2)
+    reference_index = IndexFlatIP(index.d if hasattr(index, 'd') else 384)
+    expected_metric_type = reference_index.metric_type
+    
+    if hasattr(index, 'metric_type'):
+        metric_type = int(index.metric_type)
+        if metric_type != expected_metric_type:
+            print(f"⚠️  WARNING: Loaded index has metric_type={metric_type}")
+            print(f"   Expected metric_type={expected_metric_type} (same as IndexFlatIP)")
+            print(f"   This index may have been created with IndexFlatL2 instead of IndexFlatIP")
+            print(f"   Search results may be incorrect for cosine similarity (normalized vectors)")
+            print(f"   Recommendation: Delete this index and rebuild using --index command")
+    
     # Load metadata
     with open(metadata_path, 'r', encoding='utf-8') as f:
         metadata_map = json.load(f)

@@ -83,7 +83,6 @@ def load_material_file(data_root: Path, course_name: str) -> Optional[Dict[str, 
 def process_course(
     data_root: Path,
     course_name: str,
-    embedding_model: Embedding,
     chunk_size: int = 512,
     overlap: int = 50
 ) -> Tuple[List[DocChunk], int]:
@@ -93,7 +92,6 @@ def process_course(
     Args:
         data_root: Root data directory
         course_name: Course name
-        embedding_model: Embedding model instance
         chunk_size: Chunk size in tokens
         overlap: Overlap size in tokens
         
@@ -106,14 +104,14 @@ def process_course(
     # Process syllabus files
     syllabus_files = load_syllabus_files(data_root, course_name)
     for syllabus_json in syllabus_files:
-        chunks = chunk_syllabus(syllabus_json)
+        chunks = chunk_syllabus(syllabus_json, chunk_size=chunk_size, overlap=overlap)
         all_chunks.extend(chunks)
         doc_count += 1
     
     # Process material file
     material_json = load_material_file(data_root, course_name)
     if material_json:
-        chunks = chunk_material(material_json)
+        chunks = chunk_material(material_json, chunk_size=chunk_size, overlap=overlap)
         all_chunks.extend(chunks)
         doc_count += 1
     
@@ -150,7 +148,7 @@ def build_index_for_course(
     
     # Process course documents
     chunks, doc_count = process_course(
-        data_root, course_name, embedding_model, chunk_size, overlap
+        data_root, course_name, chunk_size, overlap
     )
     
     if not chunks:
@@ -180,7 +178,6 @@ def build_index_for_course(
         if isinstance(batch_embeddings, list):
             all_embeddings.extend(batch_embeddings)
         else:
-            # If it's already a numpy array
             all_embeddings.extend(batch_embeddings.tolist())
     
     # Convert to numpy array
@@ -262,10 +259,7 @@ def build_indices_for_all_courses(
     if only_course:
         course_dirs = [data_root / only_course] if (data_root / only_course).exists() else []
     else:
-        course_dirs = [
-            d for d in data_root.iterdir()
-            if d.is_dir() and d.name not in ["scratch", "raw", "converted", "processed", "indices"]
-        ]
+        course_dirs = [d for d in data_root.iterdir() if d.is_dir() and d.name not in ["scratch"]]
     
     if not course_dirs:
         print("[INDEX] No courses found to index")
