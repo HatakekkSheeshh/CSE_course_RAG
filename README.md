@@ -92,7 +92,7 @@ Run any combination of steps:
 python run.py --convert --dpi 220 --data-raw ./data/raw --data-cvt-root ./data/converted
 
 # 2) OCR + Extract syllabus items from images into per-page JSON
-python run.py --ocr --data-root ./data --data-cvt-root ./data/converted
+python run.py --syllabus --data-root ./data --data-cvt-root ./data/converted
 
 # 3) Merge parsed syllabus JSON across pages per course
 python run.py --merge --data-root ./data --out-root ./data/processed
@@ -191,7 +191,7 @@ to start Streamlit automatically, then run with `-f docker-compose.dev.yml`.
 
 - **[Step 3: OCR + extract syllabus]**
   ```bash
-  python run.py --ocr --data-root ./data --data-cvt-root ./data/converted
+  python run.py --syllabus --data-root ./data --data-cvt-root ./data/converted
   ```
 
 - **[Step 4: merge parsed outputs]**

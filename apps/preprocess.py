@@ -42,7 +42,7 @@ def render(
                 cmd = [
                     python_bin(),
                     "run.py",
-                    "--ocr",
+                    "--syllabus",
                 ]
                 code, _ = run_cmd(cmd)
                 if code == 0:
