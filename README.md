@@ -65,7 +65,7 @@ docker compose up -d app
 
 3) Open a shell inside the container:
 ```powershell
-docker compose exec app bash
+
 ```
 
 4) Run the Streamlit demo on port 8000:
@@ -85,18 +85,75 @@ The CLI lives in `run.py` and expects a `data/` workspace:
 - `data/scratch/` – intermediate artifacts (annotations, temp files)
 - `data/processed/` – merged outputs per course
 
-Run any combination of steps:
 
-```bash
-# 1) Convert raw docs to images (png) into data/converted
-python run.py --convert --dpi 220 --data-raw ./data/raw --data-cvt-root ./data/converted
+### Detailed pipeline walkthrough
 
-# 2) OCR + Extract syllabus items from images into per-page JSON
-python run.py --ocr --data-root ./data --data-cvt-root ./data/converted
+**1. Convert raw docs to images**
+- Input: `data/raw/<CourseName>/*` (PDF, PPTX, DOCX, etc.)
+- Output: `data/converted/<CourseName>/Syllabus/*.png` (+ optional `Chapter_*` folders)
+- Run:
+  ```bash
+  python run.py --convert --dpi 220 \
+    --data-raw ./data/raw \
+    --data-cvt-root ./data/converted
+  ```
 
-# 3) Merge parsed syllabus JSON across pages per course
-python run.py --merge --data-root ./data --out-root ./data/processed
-```
+**2. OCR + syllabus parsing**
+- Input: Syllabus PNGs produced in step 1
+- Output:
+  - OCR dumps under `data/<Course>/syllabus/ocr/`
+  - Plain text in `data/<Course>/syllabus/text/`
+  - Parsed syllabus JSON per slide in `data/<Course>/syllabus/parsed/`
+- Run:
+  ```bash
+  python run.py --syllabus \
+    --data-root ./data \
+    --data-cvt-root ./data/converted \
+    --only-course <optional CourseName>
+  ```
+
+**3. Merge parsed JSON into course artifacts**
+- Input: `data/<Course>/syllabus/parsed/*.syllabus.json`
+- Output: `data/processed/<course_slug>/<course_slug>.syllabus.*`
+- Run:
+  ```bash
+  python run.py --merge \
+    --data-root ./data \
+    --out-root ./data/processed \
+    --only-course <optional CourseName>
+  ```
+
+**4. Extract material (chapter slides)**
+- Input: `data/converted/<Course>/Chapter_*/`
+- Output: `data/<Course>/material/material.json`
+- Run:
+  ```bash
+  python run.py --material --data-root ./data --only-course <optional CourseName>
+  ```
+
+**5. Build FAISS indices for RAG**
+- Input: merged syllabus/material JSON under `data/<Course>/`
+- Output: `data/indices/<course>/index.faiss` + metadata map
+- Run:
+  ```bash
+  python run.py --index \
+    --data-root ./data \
+    --index-dir ./data/indices \
+    --chunk-size 512 --chunk-overlap 50 --batch-size 32 \
+    --only-course <optional CourseName>
+  ```
+
+**6. Debug existing indices / run ad-hoc queries**
+- Input: `data/indices/<course>/index.faiss`
+- Run:
+  ```bash
+  python run.py --debug-index \
+    --index-dir ./data/indices \
+    --only-course <optional CourseName> \
+    --test-query "What is the grading policy?" \
+    --k 5
+  ```
+  Prints metadata summaries and optional search hits for fast validation.
 
 Notes:
 - The code detects syllabus images under `converted/<COURSE>/Syllabus/**`.
@@ -228,15 +285,6 @@ to start Streamlit automatically, then run with `-f docker-compose.dev.yml`.
 - Model loader in `models/load_model.py` is currently a WIP placeholder.
 - The `docs/` folder includes project documents; integrate key requirements into the
   app/pipelines as needed.
-
----
-
-## Roadmap
-
-- **[Short‑term]** Sample data bundle and example outputs for quick validation.
-- **[Short‑term]** Streamlit panels to preview OCR overlays and parsed syllabus per page.
-- **[Mid‑term]** Optional embedding + FAISS indexing pipeline for RAG queries.
-- **[Mid‑term]** REST endpoints to trigger pipelines and fetch artifacts.
 
 ---
 
