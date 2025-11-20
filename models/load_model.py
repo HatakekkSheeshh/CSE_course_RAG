@@ -1,12 +1,12 @@
 from sentence_transformers import SentenceTransformer
-from faiss import IndexFlatIP
 from paddleocr import PaddleOCR
+from FlagEmbedding import FlagReranker
 from typing import Optional
 
 """
 Load model for different purposes
 """
-def load_model(kind: str = "ocr", embedding_dim: Optional[int] = None):
+def load_model(kind: str = "ocr", *, model_name: Optional[str] = None):
     if kind == "ocr":
         return PaddleOCR(
             lang="en",
@@ -17,5 +17,9 @@ def load_model(kind: str = "ocr", embedding_dim: Optional[int] = None):
         )
     elif kind == "embed":
         return SentenceTransformer("sentence-transformers/all-MiniLM-L6-v2")
+    elif kind == "reranker":
+        # Use large bge reranker for better scoring; can run on CPU (fp32) by default
+        name = model_name or "BAAI/bge-reranker-large"
+        return FlagReranker(name, use_fp16=False)
     else:
         raise ValueError(f"Unknown kind: {kind}")
