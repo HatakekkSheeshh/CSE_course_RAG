@@ -53,8 +53,8 @@ class Reranker:
             return []
 
         pairs = [[query, text] for _, text, _ in passages]
-        raw_scores = self.model.compute_score(pairs)  # type: ignore[attr-defined]
-
+        raw_scores = self.model.compute_score(pairs) 
+        
         # Softmax normalize for confidence estimates
         max_score = max(raw_scores)
         exp_scores = [math.exp(s - max_score) for s in raw_scores]
@@ -62,7 +62,7 @@ class Reranker:
 
         confidences = [val / normalizer for val in exp_scores]
 
-        results = []
+        results = []    
         for (chunk_id, text, metadata), score, conf in zip(passages, raw_scores, confidences):
             results.append(
                 RerankResult(

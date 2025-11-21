@@ -27,6 +27,10 @@ openai
 
 # webapp
 streamlit
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.7
+watchfiles>=0.24
 
 # optional: qdrant support
 qdrant-client

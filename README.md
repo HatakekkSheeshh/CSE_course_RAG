@@ -1,312 +1,102 @@
 # CSE Course RAG
 
-Convert course documents to images, extract syllabus content with OCR, and produce structured artifacts ready for downstream RAG (Retrieval-Augmented Generation) pipelines. The project ships with a containerized environment and a Streamlit demo console to run the end‑to‑end processing steps.
+Retrieval-Augmented Generation system for CSE course materials. Documents are processed into FAISS indices, then exposed through a FastAPI backend and a React/Vite chat UI.
 
 ---
 
-## Highlights
+## System Pipeline
 
-- **[Convert]** PDFs/Office slides ➜ images (via `pdf2image` + headless LibreOffice).
-- **[OCR + Parse]** PaddleOCR ➜ normalized items and syllabus JSON per page.
-- **[Merge]** Course-level aggregation of parsed JSON for analysis or indexing.
-- **[Containerized]** Reproducible env with `Dockerfile` and `docker-compose.yml`.
-- **[Demo UI]** Streamlit console in `apps/` to run each step and view logs.
+1. **Convert** – PDFs/Office docs ➜ page images (`preprocessing/img_process`).
+2. **OCR & Parse** – PaddleOCR extracts text; syllabus/material parsers build structured JSON (`preprocessing/syllabus`, `preprocessing/material`).
+3. **Chunk & Embed** – Text is chunked (`preprocessing/chunking.py`) and embedded with `sentence-transformers` (`models/embedding.py`).
+4. **Index & Retrieve** – FAISS indices plus metadata maps live under `data/indices`.
+5. **RAG Serving** – `rag/query_pipeline.py` retrieves + reranks chunks; `rag/llm_client.py` calls the LLM; `api/main.py` exposes `/api/query`.
+6. **Chat UI** – `ui/` (React + Vite + Tailwind) calls the backend and surfaces answers + sources.
 
 ---
 
-## Architecture
+## Tech Stack
 
-```mermaid
-graph LR
-  A["Raw Docs (PDF/Office)"] -- Convert --> B["Images per Course"]
-  B -- OCR --> C["Page OCR JSON"]
-  C -- Parse --> D["Page Syllabus JSON"]
-  D -- Merge --> E["Course Outputs (processed/)"]
-  E -- Explore --> F["Streamlit Demo"]
+| Area            | Technologies |
+|-----------------|--------------|
+| Processing      | Python, PaddleOCR, pdf2image, LibreOffice, numpy |
+| Retrieval       | sentence-transformers, FAISS, FlagEmbedding reranker |
+| Backend API     | FastAPI, Pydantic, Uvicorn, OpenAI SDK |
+| Frontend        | React 19, Vite, TailwindCSS |
+| Containerization| Docker, Docker Compose |
+
+---
+
+## Running the Project
+
+### Prerequisites
+- Docker Desktop (WSL2 recommended on Windows)
+- OpenAI API key (or compatible LLM provider)
+
+### 1. Configure Environment
+Create a `.env` (or export variables) with at least:
+```env
+OPENAI_API_KEY=sk-...
+OPENAI_MODEL=gpt-4o-mini
+LLM_PROVIDER=openai
 ```
+(Optional) override `RAG_DATA_DIR`, `RAG_INDEX_DIR`, etc.
 
----
-
-## Project Structure
-
-- `Dockerfile` – Base image with Python, LibreOffice, system deps, and Python libs.
-- `docker-compose.yml` – One service `app` exposing port `8000` and mounting the repo.
-- `requirements.txt` – Python dependencies (OCR, CV, RAG-related libs, Streamlit).
-- `run.py` – CLI entrypoint for data pipelines:
-  - `pipeline_convert()` – Convert raw docs to images.
-  - `pipeline_ocr_and_extract()` – OCR each image and save page-level JSON.
-  - `pipeline_merge_all()` – Merge parsed JSON into course-level outputs.
-- `preprocessing/` – Helpers for conversion, OCR, path organization, and merging.
-- `models/` – Model loaders (WIP; `load_model.py`).
-- `apps/app.py` – Streamlit demo console to run pipelines and stream logs.
-- `data/` – Workspace for inputs/outputs (ignored in git).
-- `docs/` – Project documents (timelines/specs).
-
----
-
-## Prerequisites
-
-- Docker Desktop (Windows with WSL2 recommended)
-- Optional: NVIDIA/CUDA not required (CPU stack by default)
-
----
-
-## Quick Start (Docker)
-
-1) Build the image:
-```powershell
-docker compose build app
-```
-
-2) Start the dev container (detached):
-```powershell
-docker compose up -d app
-```
-
-3) Open a shell inside the container:
-```powershell
-
-```
-
-4) Run the Streamlit demo on port 8000:
+### 2. Start Services
 ```bash
-streamlit run apps/app.py --server.address 0.0.0.0 --server.port 8000
+docker compose up --build
 ```
-Then open: http://localhost:8000
+Services:
+- `backend` – FastAPI on `http://localhost:8000`
+- `frontend` – Vite dev server on `http://localhost:5173`
 
----
-
-## Data Pipelines (CLI)
-
-The CLI lives in `run.py` and expects a `data/` workspace:
-
-- `data/raw/` – raw inputs (PDFs, Office docs, etc.)
-- `data/converted/` – generated images grouped per course
-- `data/scratch/` – intermediate artifacts (annotations, temp files)
-- `data/processed/` – merged outputs per course
-
-
-### Detailed pipeline walkthrough
-
-**1. Convert raw docs to images**
-- Input: `data/raw/<CourseName>/*` (PDF, PPTX, DOCX, etc.)
-- Output: `data/converted/<CourseName>/Syllabus/*.png` (+ optional `Chapter_*` folders)
-- Run:
+### 3. Query
+- Visit the UI at `http://localhost:5173` to chat.
+- Direct API call:
   ```bash
-  python run.py --convert --dpi 220 \
-    --data-raw ./data/raw \
-    --data-cvt-root ./data/converted
-  ```
-
-**2. OCR + syllabus parsing**
-- Input: Syllabus PNGs produced in step 1
-- Output:
-  - OCR dumps under `data/<Course>/syllabus/ocr/`
-  - Plain text in `data/<Course>/syllabus/text/`
-  - Parsed syllabus JSON per slide in `data/<Course>/syllabus/parsed/`
-- Run:
-  ```bash
-  python run.py --syllabus \
-    --data-root ./data \
-    --data-cvt-root ./data/converted \
-    --only-course <optional CourseName>
-  ```
-
-**3. Merge parsed JSON into course artifacts**
-- Input: `data/<Course>/syllabus/parsed/*.syllabus.json`
-- Output: `data/processed/<course_slug>/<course_slug>.syllabus.*`
-- Run:
-  ```bash
-  python run.py --merge \
-    --data-root ./data \
-    --out-root ./data/processed \
-    --only-course <optional CourseName>
-  ```
-
-**4. Extract material (chapter slides)**
-- Input: `data/converted/<Course>/Chapter_*/`
-- Output: `data/<Course>/material/material.json`
-- Run:
-  ```bash
-  python run.py --material --data-root ./data --only-course <optional CourseName>
-  ```
-
-**5. Build FAISS indices for RAG**
-- Input: merged syllabus/material JSON under `data/<Course>/`
-- Output: `data/indices/<course>/index.faiss` + metadata map
-- Run:
-  ```bash
-  python run.py --index \
-    --data-root ./data \
-    --index-dir ./data/indices \
-    --chunk-size 512 --chunk-overlap 50 --batch-size 32 \
-    --only-course <optional CourseName>
-  ```
-
-**6. Debug existing indices / run ad-hoc queries**
-- Input: `data/indices/<course>/index.faiss`
-- Run:
-  ```bash
-  python run.py --debug-index \
-    --index-dir ./data/indices \
-    --only-course <optional CourseName> \
-    --test-query "What is the grading policy?" \
-    --k 5
-  ```
-  Prints metadata summaries and optional search hits for fast validation.
-
-Notes:
-- The code detects syllabus images under `converted/<COURSE>/Syllabus/**`.
-- OCR engine: PaddleOCR (see `preprocessing/dectector.py`).
-
-Outputs are saved under `data/` by default:
-
-- `data/converted/<COURSE>/Syllabus/` – images produced by the converter.
-- `data/scratch/` – temporary artifacts and annotated images.
-- `data/<course>/syllabus/parsed/*.syllabus.json` – page‑level syllabus JSON.
-- `data/processed/<course>/` – merged course outputs (from the merge step).
-
----
-
-## Development Workflow
-
-- The repo is bind-mounted into the container at `/workspace` (`.:/workspace:rw`).
-- Edit code on the host; changes are immediately visible in the container.
-- Only rebuild the image when you change dependencies in `requirements.txt`:
-  ```powershell
-  docker compose build app
-  docker compose up -d app
-  ```
-- For interactive sessions, keep STDIN/TTY enabled (already set in compose).
-
-### Running Streamlit during development
-```bash
-streamlit run apps/app.py --server.address 0.0.0.0 --server.port 8000
-```
-If you prefer a dev-specific stack, add a `docker-compose.dev.yml` with a `command`
-to start Streamlit automatically, then run with `-f docker-compose.dev.yml`.
-
----
-
-## Common Commands
-
-- Show services:
-  ```powershell
-  docker compose ps
-  ```
-- Get a shell in the app container:
-  ```powershell
-  docker compose exec app bash
-  ```
-- Install a new Python lib temporarily for testing:
-  ```powershell
-  docker compose exec app pip install <package>
-  ```
-  For reproducibility, also add it to `requirements.txt` and rebuild.
-
----
-
-## Troubleshooting
-
-- **Cannot open in browser**: Ensure the app listens on `0.0.0.0:8000` inside container
-  and that `ports: ["8000:8000"]` is present. Open `http://localhost:8000` on host.
-- **Slow rebuilds**: Dependencies are layer-cached by copying `requirements.txt` first
-  in the `Dockerfile`. Changing only source files should not invalidate dependency layers.
-- **Missing system libs for OCR/PDF**: The base image installs `poppler-utils`,
-  LibreOffice, and OpenMP runtime (`libgomp1`). Check the `Dockerfile` if you extend it.
-
----
-
-## Data Conventions
-
-- **Input layout**
-  - Place raw documents under `data/raw/<CourseName>/...`
-  - Converter writes images to `data/converted/<CourseName>/Syllabus/`.
-- **OCR item schema (simplified)**
-  - Each page JSON contains a list of detected items (text, bbox, score, line order).
-- **Syllabus JSON (per page)**
-  - Captures page metadata: `source_file`, `page_index`, `language`, `ocr_engine`, `timestamp`, `raw_ocr_text`, `course_name`.
-- **Merged outputs**
-  - Aggregated per course into `data/processed/<course>/...` using `preprocessing/path_process/merge_parsed.py`.
-
----
-
-## Dummy steps (scaffold)
-
-- **[Step 0: prepare folders]**
-  ```bash
-  mkdir -p data/raw data/converted data/processed
-  ```
-
-- **[Step 1: add some raw inputs]**
-  - Drop a couple of PDF/Office files into `data/raw/SomeCourse/`.
-
-- **[Step 2: convert to images]**
-  ```bash
-  python run.py --convert --dpi 220 --data-raw ./data/raw --data-cvt-root ./data/converted
-  ```
-
-- **[Step 3: OCR + extract syllabus]**
-  ```bash
-  python run.py --syllabus --data-root ./data --data-cvt-root ./data/converted
-  ```
-
-- **[Step 4: merge parsed outputs]**
-  ```bash
-  python run.py --merge --data-root ./data --out-root ./data/processed
-  # or only one course
-  # python run.py --merge --data-root ./data --out-root ./data/processed --only-course SomeCourse
-  ```
-
-- **[Step 5: quick model sanity-check]**
-  ```python
-  from models.load_model import load_model
-  embed, index, ocr = load_model()
-  print('embed dim:', embed.get_sentence_embedding_dimension())
-  print('faiss d:', index.d)
-  ```
-
-- **[Step 6: run demo UI (Streamlit)]**
-  ```bash
-  streamlit run apps/app.py --server.address 0.0.0.0 --server.port 8000
-  # open http://localhost:8000
-  ```
-
-- **[Docker one-liners]**
-  ```powershell
-  docker compose up -d app
-  docker compose exec app bash
+  curl -X POST http://localhost:8000/api/query \
+    -H "Content-Type: application/json" \
+    -d '{"question":"What is the grading policy?"}'
   ```
 
 ---
 
-## Notes
+## Data / CLI Pipelines
 
-- Model loader in `models/load_model.py` is currently a WIP placeholder.
-- The `docs/` folder includes project documents; integrate key requirements into the
-  app/pipelines as needed.
+All CLI steps are orchestrated via `run.py` and expect the `data/` workspace:
+
+| Command | Purpose |
+|---------|---------|
+| `python run.py --convert` | Docs ➜ images (`data/converted`) |
+| `python run.py --syllabus` / `--material` | OCR + parsing, writes per-course JSON |
+| `python run.py --merge` | Merge parsed outputs into `data/processed/<course>` |
+| `python run.py --index` | Chunk, embed, and build FAISS indices in `data/indices` |
+| `python run.py --debug-index --test-query "<question>"` | Inspect retrieval quality |
+
+Populate `data/raw/<CourseName>/` with PDFs before running the pipeline.
 
 ---
 
-## RAG System Completion Plan
+## Repository Layout
 
-For a detailed implementation plan to complete the RAG system, see the comprehensive planning document:
+- `preprocessing/` – converters, OCR, parsing helpers.
+- `models/` – embedding loader, FAISS utilities, reranker wrapper.
+- `rag/` – retrieval + LLM orchestration.
+- `api/` – FastAPI app exposing `/health`, `/courses`, `/api/query`.
+- `ui/` – Vite/React chat frontend (Dockerfile included).
+- `docs/` – design references (e.g., `docs/rag-completion-plan.md`).
 
-📋 **[RAG System Completion Plan](docs/rag-completion-plan.md)**
+---
 
-This document includes:
-- Current progress assessment (~60% complete)
-- Detailed breakdown of completed vs. missing components
-- Phase-by-phase implementation guide (LLM Integration, RAG Pipeline, UI)
-- Step-by-step instructions for each component
-- Timeline and milestones (9-12 days to completion)
-- Testing & evaluation strategy
-- Code architecture and file structure
+## Additional Notes
 
-The plan covers the remaining work needed to transform the current retrieval system into a complete RAG (Retrieval-Augmented Generation) system with LLM integration and user-facing interfaces.
+- Backend dependencies are listed in `requirements.txt`.
+- Frontend dependencies are managed via `ui/package.json`.
+- Set `OPENAI_API_KEY` before bringing up the stack; the API will fall back to retrieval-only answers if no LLM is available.
+- The legacy Streamlit console in `apps/app.py` remains for pipeline inspection but is not part of the default Docker workflow.
 
 ---
 
 ## License
 
-Specify your license here (e.g., MIT) if applicable.
+Add your preferred license here (e.g., MIT).

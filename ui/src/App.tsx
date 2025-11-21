@@ -1,61 +1,154 @@
-import { useState } from "react";
+import { useCallback, useMemo, useState } from "react";
+
+type SourceChunk = {
+  chunk_id: string;
+  text: string;
+  score: number;
+  confidence: number;
+  course?: string | null;
+  metadata?: Record<string, unknown> | null;
+};
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000/api";
 
 function App() {
-  const [text, setText] = useState("");
+  const [question, setQuestion] = useState("");
+  const [answer, setAnswer] = useState<string | null>(null);
+  const [sources, setSources] = useState<SourceChunk[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const canSubmit = useMemo(
+    () => question.trim().length > 3 && !loading,
+    [question, loading]
+  );
+
+  const askQuestion = useCallback(async () => {
+    if (!canSubmit) {
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    setAnswer(null);
+    setSources([]);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/query`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ question: question.trim() }),
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.detail ?? "Unexpected server error");
+      }
+
+      if (data.status !== "ok") {
+        setError(data.answer ?? "No answer available.");
+        return;
+      }
+
+      setAnswer(data.answer);
+      setSources(data.sources ?? []);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to reach backend.";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  }, [canSubmit, question]);
 
   return (
-    <div className="min-h-screen bg-[#3a3a3a] flex flex-col">
-      {/* Top bar */}
-      <div className="flex items-center justify-between px-6 py-4 text-white text-sm">
-        {/* <div className="font-semibold tracking-wide">HuuCau</div> */}
-
-        {/* <div className="flex gap-6 opacity-80">
-          <span>A</span>
-          <span>B</span>
-          <span>C</span>
-          <span>D</span>
-          <span>E</span>
-        </div> */}
-
-        <div className="ml-auto flex gap-2">
-          <button className="px-3 py-1 rounded-full bg-gray-600 text-xs">
-            Sign up
-          </button>
-          <button className="px-3 py-1 rounded-full bg-indigo-500 text-xs">
-            Sign in
-          </button>
+    <div className="min-h-screen bg-[#131316] text-white flex flex-col">
+      <div className="flex items-center justify-between px-6 py-4 text-sm border-b border-white/10">
+        <div className="font-semibold tracking-wide">CSE Course RAG</div>
+        <div className="text-xs text-gray-400">
+          Powered by Retrieval-Augmented Generation
         </div>
       </div>
 
-      {/* Center content */}
-      <div className="flex-1 flex flex-col items-center justify-center">
-        <div className="text-center mb-6">
-          <div className="text-5xl mb-4">❄️</div>
-          <h1 className="text-white text-lg font-semibold">
-            {/* Artificial Intelligence by Quoc Hieu */}
-          </h1>
-        </div>
+      <main className="flex-1 flex flex-col items-center px-4 py-10 gap-6">
+        <div className="w-full max-w-3xl space-y-4">
+          <div className="bg-[#1f1f27] rounded-2xl border border-white/10 p-5 shadow-2xl shadow-indigo-900/20">
+            <div className="flex justify-between items-center mb-3">
+              <h1 className="text-lg font-semibold">Ask the syllabus</h1>
+              {loading && (
+                <span className="text-xs text-indigo-300 animate-pulse">
+                  Thinking...
+                </span>
+              )}
+            </div>
 
-        <div className="w-full max-w-xl bg-[#2f2f2f] rounded-2xl border border-gray-600 px-4 py-3">
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="Ask something hard."
-            className="w-full bg-transparent text-white resize-none outline-none text-sm"
-            rows={2}
-          />
+            <textarea
+              value={question}
+              onChange={(e) => setQuestion(e.target.value)}
+              placeholder="Example: What are the grading criteria for Operating Systems?"
+              className="w-full bg-transparent text-white resize-none outline-none text-base placeholder:text-gray-500"
+              rows={4}
+            />
 
-          <div className="flex justify-end mt-2">
-            <button className="w-10 h-10 flex items-center justify-center rounded-full bg-indigo-600 hover:bg-indigo-500 transition">
-              ➤
-            </button>
+            <div className="flex justify-end mt-4">
+              <button
+                onClick={askQuestion}
+                disabled={!canSubmit}
+                className="px-5 py-2 rounded-full bg-indigo-600 hover:bg-indigo-500 disabled:bg-gray-600 disabled:cursor-not-allowed transition flex items-center gap-2 text-sm"
+              >
+                {loading ? "Sending..." : "Send"}
+                <span className="text-lg">➤</span>
+              </button>
+            </div>
+
+            {error && (
+              <p className="text-sm text-rose-300 bg-rose-950/30 border border-rose-900/40 rounded-lg px-3 py-2 mt-3">
+                {error}
+              </p>
+            )}
           </div>
-        </div>
-      </div>
 
-      <div className="text-center text-xs text-gray-400 py-4">
-        © 2025 CSE_COURSE_RAG
-      </div>
+          {answer && (
+            <section className="bg-[#18181f] rounded-2xl border border-white/5 p-5 space-y-4">
+              <div>
+                <h2 className="text-sm uppercase tracking-wider text-gray-400">
+                  Answer
+                </h2>
+                <p className="mt-2 leading-relaxed text-gray-100">{answer}</p>
+              </div>
+
+              {sources.length > 0 && (
+                <div className="space-y-2">
+                  <h3 className="text-xs uppercase tracking-wider text-gray-500">
+                    Sources
+                  </h3>
+                  <div className="space-y-2">
+                    {sources.map((source) => (
+                      <div
+                        key={source.chunk_id}
+                        className="rounded-xl bg-white/5 p-3 border border-white/10"
+                      >
+                        <div className="flex justify-between text-xs text-gray-400">
+                          <span>{source.course ?? "N/A"}</span>
+                          <span>{(source.confidence * 100).toFixed(0)}%</span>
+                        </div>
+                        <p className="mt-2 text-sm text-gray-200 overflow-hidden">
+                          {source.text}
+                        </p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </section>
+          )}
+        </div>
+      </main>
+
+      <footer className="text-center text-xs text-gray-500 py-4 border-t border-white/5">
+        © {new Date().getFullYear()} CSE Course RAG
+      </footer>
     </div>
   );
 }

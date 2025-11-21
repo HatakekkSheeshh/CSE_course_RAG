@@ -1,11 +1,31 @@
 services:
-  app:
+  backend:
     build: .
-    image: cse_course_rag:latest
+    image: cse_course_rag_backend:latest
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY:-}
+      - OPENAI_MODEL=${OPENAI_MODEL:-gpt-3.5-turbo}
+      - LLM_PROVIDER=${LLM_PROVIDER:-openai}
+      - RAG_DATA_DIR=${RAG_DATA_DIR:-/workspace/data}
+      - RAG_INDEX_DIR=${RAG_INDEX_DIR:-/workspace/data/indices}
     volumes:
       - .:/workspace:rw
     working_dir: /workspace
-    tty: true
-    stdin_open: true
     ports:
       - "8000:8000"
+
+  frontend:
+    build:
+      context: ./ui
+    image: cse_course_rag_frontend:latest
+    environment:
+      - VITE_API_BASE_URL=http://localhost:8000/api
+      - CHOKIDAR_USEPOLLING=1
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./ui:/app
+      - /app/node_modules
+    depends_on:
+      - backend
