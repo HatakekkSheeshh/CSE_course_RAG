@@ -99,4 +99,6 @@ Populate `data/raw/<CourseName>/` with PDFs before running the pipeline.
 
 ## License
 
-Add your preferred license here (e.g., MIT).
+MIT License © 2025 Nguyen Quoc Hieu, Ho Chi Minh City University of Technology
+
+See the `LICENSE` file for full text.
