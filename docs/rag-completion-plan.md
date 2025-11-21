@@ -28,13 +28,13 @@ This document outlines the current progress of the CSE Course RAG system and pro
 ### Overall Completion: ~60%
 
 ```
-✅ Data Pipeline    [████████████████████] 100% Complete
-✅ Chunking         [████████████████████] 100% Complete
-✅ Embedding        [████████████████████] 100% Complete
-✅ Indexing         [████████████████████] 100% Complete
-❌ LLM Integration  [                    ]   0% Complete
-❌ RAG Pipeline     [                    ]   0% Complete
-❌ User Interface   [                    ]   0% Complete
+✅ Data Pipeline         [████████████████████] 100% Complete
+✅ Chunking              [████████████████████] 100% Complete
+✅ Embedding             [████████████████████] 100% Complete
+✅ Indexing + Reranker   [████████████████████] 100% Complete
+❌ LLM Integration       [                    ]   0% Complete
+⚠️ RAG Orchestration     [██████              ]  30% Complete
+✅ User Interface (Web)  [████████████████████] 100% Complete
 ```
 
 ### System Capabilities
@@ -156,9 +156,37 @@ python run.py --debug-index --test-query "What is the course about?"
 
 ---
 
+### 5. Retrieval + Reranker ✅
+
+**Location**: `rag/query_pipeline.py`, `models/reranker.py`
+
+**Highlights:**
+- Loads FAISS indices and metadata for all courses, supporting cross-course retrieval.
+- Retrieves top-k chunks per course, then re-ranks with FlagEmbedding’s BGE reranker wrapper.
+- Confidence thresholds prevent weak contexts from reaching the answer stage.
+- CLI support via `rag/query_cli.py` for manual validation.
+
+**Status**: ✅ Production-ready
+
+---
+
+### 6. Web UI (React/Vite) ✅
+
+**Location**: `ui/`
+
+**Highlights:**
+- Modern React 19 + Vite + Tailwind SPA with chat-style UX.
+- Dockerized dev/prod workflow; hot reload enabled via bind mounts.
+- Calls FastAPI backend at `/api/query`, displaying answers plus source chunks.
+- Includes loading/error states and provenance badges for transparency.
+
+**Status**: ✅ Ready for demos
+
+---
+
 ## Missing Components
 
-### 5. LLM Integration ❌
+### 7. LLM Integration ❌
 
 **Current State**: No LLM integration exists
 
@@ -174,7 +202,7 @@ python run.py --debug-index --test-query "What is the course about?"
 
 ---
 
-### 6. RAG Pipeline ❌
+### 8. RAG Orchestration ❌
 
 **Current State**: Only retrieval exists, no generation
 
@@ -189,22 +217,7 @@ python run.py --debug-index --test-query "What is the course about?"
 
 ---
 
-### 7. User Interface ❌
-
-**Current State**: Streamlit app only has preprocessing UI
-
-**Requirements:**
-- Chat interface for Q&A
-- Query input and response display
-- Optional: Show retrieved chunks (for transparency)
-- Optional: Streaming response display
-
-**Needed Files:**
-- Enhanced `apps/app.py` or new `apps/chat.py`
-
----
-
-### 8. API Endpoints ❌ (Optional but Recommended)
+### 9. API Endpoints ❌ (Optional but Recommended)
 
 **Requirements:**
 - REST API for programmatic access
@@ -637,6 +650,33 @@ project/
 └── docs/
     └── rag-completion-plan.md  # [THIS FILE]
 ```
+
+---
+
+## Appendix: Material/Syllabus → Embedding Pipeline
+
+### Flow Summary
+1. **Input**: `data/<course>/syllabus/parsed/*.syllabus.json` and `data/<course>/material/material.json`.
+2. **Loading** (`preprocessing/indexing_pipeline.py`): `load_syllabus_files()` + `load_material_file()` aggregate structured JSON.
+3. **Chunking** (`preprocessing/chunking.py`): `chunk_syllabus()`, `chunk_material()`, and the shared `chunk_text()` create ~512-token segments with 50-token overlap while preserving metadata.
+4. **Embedding** (`models/embedding.py`): `Embedding.embed_batch()` runs `sentence-transformers/all-MiniLM-L6-v2` (384-dim) in batches (default 32).
+5. **Indexing** (`models/indexing.py`): `create_index()` + `add_documents()` normalize vectors (unit L2 norm) and add them to FAISS `IndexFlatIP`. Metadata is persisted alongside `index.faiss`.
+
+### Stage Details
+- **Chunk metadata**: `Metadata`/`DocChunk` capture doc type (`syllabus`, `slide`), course ID, source file, page index, etc. Chunk IDs follow prefixes such as `CO1023-syllabus-info-0000`.
+- **Normalization math**: for each embedding vector **v**, compute `v_norm = v / ||v||` where `||v|| = sqrt(sum(v_i^2))`, ensuring cosine similarity via inner product.
+- **Output artifacts**: `data/indices/<course>/index.faiss` (vector store) and `metadata.json` (chunk text + metadata map).
+
+### CLI Entrypoints
+| Command | Purpose |
+|---------|---------|
+| `python run.py --convert` | Raw docs → images (`data/converted`) |
+| `python run.py --syllabus` / `--material` | OCR + parsing for syllabus/material |
+| `python run.py --merge` | Merge parsed outputs into `data/processed` |
+| `python run.py --index` | Chunk + embed + index (per course or all) |
+| `python run.py --debug-index --test-query "<question>"` | Inspect retrieval hits |
+
+This appendix consolidates the previous pipeline documents so the entire ingestion → embedding flow now lives in a single source of truth.
 
 ---
 
