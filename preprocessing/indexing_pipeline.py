@@ -174,7 +174,6 @@ def build_index_for_course(
     for i in tqdm(range(0, len(chunk_texts), batch_size), desc="Embedding"):
         batch = chunk_texts[i:i + batch_size]
         batch_embeddings = embedding_model.embed_batch(batch)
-        # Convert list of lists to numpy array
         if isinstance(batch_embeddings, list):
             all_embeddings.extend(batch_embeddings)
         else:

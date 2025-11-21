@@ -13,12 +13,17 @@ tiktoken>=0.7
 matplotlib
 
 # model
+numpy
 faiss-cpu
 pyarrow
 fastparquet
 sentence-transformers
+FlagEmbedding
 tqdm
 scikit-learn
+
+# llm
+openai
 
 # webapp
 streamlit

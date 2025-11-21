@@ -120,7 +120,7 @@ def load_index(path: Path) -> Tuple[IndexFlatIP, Dict[str, Dict]]:
     # Load index
     index = faiss.read_index(str(index_path))
     
-    # Validate index type (should be IndexFlatIP, not IndexFlatL2)
+    # Validate index type (should be IndexFlatIP, not IndexFlatL2)  
     reference_index = IndexFlatIP(index.d if hasattr(index, 'd') else 384)
     expected_metric_type = reference_index.metric_type
     
