@@ -23,7 +23,8 @@ tqdm
 scikit-learn
 
 # llm
-openai
+google-generativeai  # Google Gemini 
+ollama  # Ollama 
 
 # webapp
 streamlit
@@ -31,6 +32,7 @@ fastapi>=0.115
 uvicorn[standard]>=0.30
 pydantic>=2.7
 watchfiles>=0.24
+python-dotenv  # Environment variable management
 
 # optional: qdrant support
 qdrant-client

@@ -71,5 +71,5 @@ def render(tab) -> None:
                 except Exception as exc:
                     st.error(f"LLM generation failed: {exc}")
         else:
-            st.info("LLM disabled (set OPENAI_API_KEY to enable answers).")
+            st.info("LLM disabled (set GEMINI_API_KEY or configure Ollama to enable answers).")
 

@@ -21,7 +21,7 @@ Retrieval-Augmented Generation system for CSE course materials. Documents are pr
 |-----------------|--------------|
 | Processing      | Python, PaddleOCR, pdf2image, LibreOffice, numpy |
 | Retrieval       | sentence-transformers, FAISS, FlagEmbedding reranker |
-| Backend API     | FastAPI, Pydantic, Uvicorn, OpenAI SDK |
+| Backend API     | FastAPI, Pydantic, Uvicorn, Google Gemini / Ollama |
 | Frontend        | React 19, Vite, TailwindCSS |
 | Containerization| Docker, Docker Compose |
 
@@ -31,15 +31,35 @@ Retrieval-Augmented Generation system for CSE course materials. Documents are pr
 
 ### Prerequisites
 - Docker Desktop (WSL2 recommended on Windows)
-- OpenAI API key (or compatible LLM provider)
+- LLM API key (see free options below)
 
 ### 1. Configure Environment
-Create a `.env` (or export variables) with at least:
+
+Create a `.env` file in the project root (copy from `.env.example`):
+
+**Option A: Google Gemini (Free Tier - Recommended)**
 ```env
-OPENAI_API_KEY=sk-...
-OPENAI_MODEL=gpt-4o-mini
-LLM_PROVIDER=openai
+LLM_PROVIDER=gemini
+GEMINI_API_KEY=your_key_here  # Get from https://makersuite.google.com/app/apikey
+GEMINI_MODEL=gemini-pro
 ```
+
+**Option B: Ollama (Completely Free, Local)**
+```env
+LLM_PROVIDER=ollama
+OLLAMA_MODEL=llama2  # Install: ollama pull llama2
+OLLAMA_BASE_URL=http://localhost:11434
+```
+
+**Query Rewriting** (optional but recommended):
+```env
+ENABLE_QUERY_REWRITING=true          # Enable query rewriting (default: true)
+QUERY_REWRITER_TEMPERATURE=0.3       # LLM temperature for rewriting (default: 0.3)
+QUERY_REWRITER_MAX_TOKENS=100        # Max tokens for rewritten query (default: 100)
+```
+
+**Free LLM Options**: See `docs/free-llm-providers-guide.md` for setup instructions.
+
 (Optional) override `RAG_DATA_DIR`, `RAG_INDEX_DIR`, etc.
 
 ### 2. Start Services
@@ -53,11 +73,21 @@ Services:
 ### 3. Query
 - Visit the UI at `http://localhost:5173` to chat.
 - Direct API call:
+
+  **Linux/Mac:**
   ```bash
   curl -X POST http://localhost:8000/api/query \
     -H "Content-Type: application/json" \
     -d '{"question":"What is the grading policy?"}'
   ```
+
+  **Windows (PowerShell):**
+  ```powershell
+  $body = '{"question":"What is the grading policy?"}'
+  Invoke-RestMethod -Uri http://localhost:8000/api/query -Method Post -ContentType "application/json" -Body $body
+  ```
+
+  See `docs/windows-api-testing.md` for more Windows options.
 
 ---
 
@@ -72,6 +102,10 @@ All CLI steps are orchestrated via `run.py` and expect the `data/` workspace:
 | `python run.py --merge` | Merge parsed outputs into `data/processed/<course>` |
 | `python run.py --index` | Chunk, embed, and build FAISS indices in `data/indices` |
 | `python run.py --debug-index --test-query "<question>"` | Inspect retrieval quality |
+| `python -m rag.query_cli --question "<question>"` | Query with reranking and optional rewriting |
+| `python -m rag.test_query_rewriter "<question>"` | Test query rewriting functionality |
+| `curl http://localhost:8000/health` | Check API health status |
+| `curl http://localhost:8000/courses` | List available courses |
 
 Populate `data/raw/<CourseName>/` with PDFs before running the pipeline.
 
@@ -92,7 +126,7 @@ Populate `data/raw/<CourseName>/` with PDFs before running the pipeline.
 
 - Backend dependencies are listed in `requirements.txt`.
 - Frontend dependencies are managed via `ui/package.json`.
-- Set `OPENAI_API_KEY` before bringing up the stack; the API will fall back to retrieval-only answers if no LLM is available.
+- Set `GEMINI_API_KEY` (for Gemini) or configure Ollama before bringing up the stack; the API will fall back to retrieval-only answers if no LLM is available.
 - The legacy Streamlit console in `apps/app.py` remains for pipeline inspection but is not part of the default Docker workflow.
 
 ---

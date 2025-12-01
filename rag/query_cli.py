@@ -10,8 +10,15 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.append(str(ROOT))
 
+import config  # noqa: E402 - Load config first to initialize dotenv
 from rag.query_pipeline import QueryPipeline, NO_INFO_MESSAGE  # noqa: E402
 from rag.llm_client import LLMClient  # noqa: E402
+
+# Optional import for query rewriting
+try:
+    from rag.query_rewriter import create_query_rewriter
+except ImportError:
+    create_query_rewriter = None  # type: ignore
 
 
 
@@ -25,6 +32,7 @@ def build_argparser() -> argparse.ArgumentParser:
     parser.add_argument("--rerank-k", type=int, default=5, help="Top K chunks to rerank")
     parser.add_argument("--confidence-threshold", type=float, default=0.1, help="Confidence needed to call LLM")
     parser.add_argument("--no-llm", action="store_true", help="Skip LLM call, only show context")
+    parser.add_argument("--no-rewrite", action="store_true", help="Disable query rewriting")
     parser.add_argument("--dump-json", action="store_true", help="Print raw pipeline output as JSON")
     return parser
 
@@ -33,6 +41,19 @@ def main() -> None:
     parser = build_argparser()
     args = parser.parse_args()
 
+    # Create query rewriter if available and not disabled
+    query_rewriter = None
+    if not args.no_rewrite and create_query_rewriter is not None:
+        try:
+            llm_client = LLMClient()
+            if llm_client.enabled:
+                query_rewriter = create_query_rewriter(llm_client=llm_client)
+                if query_rewriter.is_available:
+                    print("Query rewriting enabled")
+        except Exception:
+            # Query rewriting is optional
+            pass
+
     pipeline = QueryPipeline(
         data_dir=Path(args.data_dir),
         index_dir=Path(args.index_dir),
@@ -40,6 +61,7 @@ def main() -> None:
         rerank_k=args.rerank_k,
         confidence_threshold=args.confidence_threshold,
         only_course=args.course,
+        query_rewriter=query_rewriter,
     )
 
     result = pipeline.answer(args.question, course=args.course)
@@ -65,9 +87,32 @@ def main() -> None:
         print("LLM skipped (--no-llm).")
         return
 
-    llm = LLMClient()
-    if not llm.enabled:
-        print("LLM disabled (missing OPENAI_API_KEY or dependency). Set --no-llm to skip.")
+    # Try to create LLM client using config
+    try:
+        llm_config = config.get_llm_provider_config()
+        provider = llm_config["provider"]
+        
+        if provider == "gemini":
+            llm = LLMClient(
+                provider=provider,
+                model=llm_config["model"],
+                api_key=llm_config["api_key"],
+            )
+        elif provider == "ollama":
+            llm = LLMClient(
+                provider=provider,
+                model=llm_config["model"],
+                base_url=llm_config["base_url"],
+            )
+        else:
+            llm = LLMClient(provider=provider)
+    except Exception as e:
+        print(f"LLM client creation failed: {e}")
+        llm = None
+    
+    if not llm or not llm.enabled:
+        provider = config.get_llm_provider()
+        print(f"LLM disabled (missing API key or dependency for {provider}). Set --no-llm to skip.")
         return
 
     contexts = [best.text] + [chunk.text for chunk in result.get("reranked", [])[1:3]]

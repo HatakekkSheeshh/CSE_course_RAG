@@ -4,24 +4,28 @@ FastAPI application exposing the CSE Course RAG pipeline via HTTP.
 
 from __future__ import annotations
 
-import os
 from functools import lru_cache
-from pathlib import Path
 from typing import Dict, List, Optional, Sequence
 
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
+import config
 from rag.llm_client import LLMClient
 from rag.query_pipeline import NO_INFO_MESSAGE, QueryPipeline, RetrievedChunk
 
+# Optional import for query rewriting
+try:
+    from rag.query_rewriter import create_query_rewriter
+except ImportError:
+    create_query_rewriter = None  # type: ignore
+
 app = FastAPI(title="CSE Course RAG API", version="0.1.0")
 
-allowed_origins = [origin.strip() for origin in os.getenv("CORS_ALLOW_ORIGINS", "*").split(",") if origin.strip()]
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=allowed_origins or ["*"],
+    allow_origins=config.get_cors_allow_origins() or ["*"],
     allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -38,7 +42,7 @@ class SourceChunk(BaseModel):
 
 
 class QueryRequest(BaseModel):
-    question: str = Field(..., min_length=4, description="End-user question")
+    question: str = Field(..., min_length=1, description="End-user question")
     course: Optional[str] = Field(
         default=None,
         description="Optional course folder name to scope retrieval (matches data/indices/<course>)",
@@ -72,31 +76,54 @@ class CoursesResponse(BaseModel):
 
 @lru_cache(maxsize=1)
 def get_pipeline() -> QueryPipeline:
-    data_dir = Path(os.getenv("RAG_DATA_DIR", "data"))
-    index_dir = Path(os.getenv("RAG_INDEX_DIR", data_dir / "indices"))
-    retrieval_k = int(os.getenv("RAG_RETRIEVAL_K", "8"))
-    rerank_k = int(os.getenv("RAG_RERANK_K", "5"))
-    confidence_threshold = float(os.getenv("RAG_CONFIDENCE_THRESHOLD", "0.1"))
-    only_course = os.getenv("RAG_ONLY_COURSE")
+    # Get configuration from centralized config module
+    rag_config = config.get_rag_pipeline_config()
+
+    # Create query rewriter if available
+    query_rewriter = None
+    if create_query_rewriter is not None:
+        try:
+            llm_client = get_llm_client()
+            query_rewriter = create_query_rewriter(llm_client=llm_client)
+        except Exception:
+            # Query rewriting is optional, continue without it
+            pass
 
     return QueryPipeline(
-        data_dir=data_dir,
-        index_dir=index_dir,
-        retrieval_k=retrieval_k,
-        rerank_k=rerank_k,
-        confidence_threshold=confidence_threshold,
-        only_course=only_course,
+        data_dir=rag_config["data_dir"],
+        index_dir=rag_config["index_dir"],
+        retrieval_k=rag_config["retrieval_k"],
+        rerank_k=rag_config["rerank_k"],
+        confidence_threshold=rag_config["confidence_threshold"],
+        only_course=rag_config["only_course"],
+        query_rewriter=query_rewriter,
     )
 
 
 @lru_cache(maxsize=1)
 def get_llm_client() -> LLMClient:
-    provider = os.getenv("LLM_PROVIDER", "openai")
-    model = os.getenv("OPENAI_MODEL")
-    try:
-        return LLMClient(provider=provider, model=model)
-    except ValueError as exc:  # pragma: no cover - provider validation
-        raise HTTPException(status_code=400, detail=str(exc))
+    # Get configuration from centralized config module
+    llm_config = config.get_llm_provider_config()
+    provider = llm_config["provider"]
+    
+    if provider == "gemini":
+        return LLMClient(
+            provider=provider,
+            model=llm_config["model"],
+            api_key=llm_config["api_key"],
+        )
+    elif provider == "ollama":
+        return LLMClient(
+            provider=provider,
+            model=llm_config["model"],
+            base_url=llm_config["base_url"],
+        )
+    else:
+        # This should never happen due to validation in config, but just in case
+        raise HTTPException(
+            status_code=400,
+            detail=f"Unsupported provider: {provider}. Supported: 'gemini', 'ollama'"
+        )
 
 
 def build_source_chunks(

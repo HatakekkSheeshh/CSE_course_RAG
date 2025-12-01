@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 type SourceChunk = {
   chunk_id: string;
@@ -9,8 +9,18 @@ type SourceChunk = {
   metadata?: Record<string, unknown> | null;
 };
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000/api";
+/* const API_BASE_URL =
+  import.meta.env.VITE_API_BASE_URL ?? "http://localhost:8000/api"; */
+
+const API_BASE_URL = "http://localhost:8000/api";
+
+// Derive API root (backend base URL without /api)
+const API_ROOT = API_BASE_URL.replace(/\/api\/?$/, "");
+
+function formatCourseName(courseId: string): string {
+  // Simple formatting: replace underscores with spaces
+  return courseId.replace(/_/g, " ");
+}
 
 function App() {
   const [question, setQuestion] = useState("");
@@ -18,9 +28,11 @@ function App() {
   const [sources, setSources] = useState<SourceChunk[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [course, setCourse] = useState<string | null>(null);
+  const [courses, setCourses] = useState<string[]>([]);
 
   const canSubmit = useMemo(
-    () => question.trim().length > 3 && !loading,
+    () => question.trim().length > 0 && !loading,
     [question, loading]
   );
 
@@ -38,7 +50,11 @@ function App() {
       const response = await fetch(`${API_BASE_URL}/query`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ question: question.trim() }),
+        body: JSON.stringify({
+          question: question.trim(),
+          course: course,
+          top_k: 5
+        }),
       });
 
       const data = await response.json();
@@ -60,7 +76,26 @@ function App() {
     } finally {
       setLoading(false);
     }
-  }, [canSubmit, question]);
+  }, [canSubmit, question, course]);
+
+  // load course
+  useEffect(() => {
+    const loadCourses = async () => {
+      try {
+        const response = await fetch(`${API_ROOT}/courses`);
+        if (!response.ok) {
+          return;
+        }
+        const data = await response.json();
+        if (Array.isArray(data.courses)) {
+          setCourses(data.courses);
+        }
+      } catch {
+      }
+    };
+
+    void loadCourses();
+  }, []);
 
   return (
     <div className="min-h-screen bg-[#131316] text-white flex flex-col">
@@ -74,18 +109,44 @@ function App() {
       <main className="flex-1 flex flex-col items-center px-4 py-10 gap-6">
         <div className="w-full max-w-3xl space-y-4">
           <div className="bg-[#1f1f27] rounded-2xl border border-white/10 p-5 shadow-2xl shadow-indigo-900/20">
-            <div className="flex justify-between items-center mb-3">
+            <div className="flex flex-col gap-3 mb-3 sm:flex-row sm:items-center sm:justify-between">
               <h1 className="text-lg font-semibold">Ask the syllabus</h1>
-              {loading && (
-                <span className="text-xs text-indigo-300 animate-pulse">
-                  Thinking...
-                </span>
-              )}
+              <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
+                {courses.length > 0 && (
+                  <select
+                    value={course ?? ""}
+                    onChange={(e) =>
+                      setCourse(e.target.value ? e.target.value : null)
+                    }
+                    className="bg-[#18181f] border border-white/20 rounded-full px-3 py-1 text-xs text-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                  >
+                    <option value="">All courses</option>
+                    {courses.map((c) => (
+                      <option key={c} value={c}>
+                        {formatCourseName(c)}
+                      </option>
+                    ))}
+                  </select>
+                )}
+                {loading && (
+                  <span className="text-xs text-indigo-300 animate-pulse">
+                    Thinking...
+                  </span>
+                )}
+              </div>
             </div>
 
             <textarea
               value={question}
               onChange={(e) => setQuestion(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  if (canSubmit) {
+                    void askQuestion();
+                  }
+                }
+              }}
               placeholder="Example: What are the grading criteria for Operating Systems?"
               className="w-full bg-transparent text-white resize-none outline-none text-base placeholder:text-gray-500"
               rows={4}

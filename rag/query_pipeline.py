@@ -14,6 +14,12 @@ from models.embedding import Embedding
 from models.indexing import load_index, search
 from models.reranker import Reranker, RerankResult
 
+# Optional import for query rewriting
+try:
+    from rag.query_rewriter import QueryRewriter
+except ImportError:
+    QueryRewriter = None  # type: ignore
+
 
 NO_INFO_MESSAGE = "I have no info"
 
@@ -51,6 +57,7 @@ class QueryPipeline:
         confidence_threshold: float = 0.1,
         preload: bool = True,
         only_course: Optional[str] = None,
+        query_rewriter: Optional[any] = None,  # QueryRewriter type, but avoid circular import
     ) -> None:
         self.data_dir = Path(data_dir)
         self.index_dir = Path(index_dir)
@@ -61,6 +68,7 @@ class QueryPipeline:
 
         self.embedding = Embedding()
         self.reranker = Reranker()
+        self.query_rewriter = query_rewriter
 
         self._indices: Dict[str, CourseIndex] = {}
         if preload:
@@ -104,7 +112,12 @@ class QueryPipeline:
     def retrieve(self, query: str, course: Optional[str] = None) -> List[RetrievedChunk]:
         self._ensure_loaded()
 
-        query_embedding = np.array(self.embedding.embed(query), dtype="float32")
+        # Rewrite query if rewriter is available
+        search_query = query
+        if self.query_rewriter and self.query_rewriter.is_available:
+            search_query = self.query_rewriter.rewrite(query)
+
+        query_embedding = np.array(self.embedding.embed(search_query), dtype="float32")
         all_results: List[RetrievedChunk] = []
 
         course_items = (

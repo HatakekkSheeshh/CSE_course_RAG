@@ -38,7 +38,6 @@ ROOT = Path(__file__).resolve().parent
 ROOT_data = ROOT / "data"
 
 # ---------------------------------------------------------------------
-# Small helper to find child dir case-insensitively
 def _find_child_dir_casefold(parent: Path, name_cf: str) -> Optional[Path]:
     for child in parent.iterdir():
         if child.is_dir() and child.name.casefold() == name_cf:
