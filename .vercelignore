@@ -1,0 +1,40 @@
+# Backend Python files
+api/
+apps/
+models/
+rag/
+preprocessing/
+config/
+
+# Data directories (very large)
+data/
+cache/
+indices/
+processed/
+raw/
+scratch/
+
+# Test and docs
+test_feature/
+docs/
+
+# Python files
+*.py
+requirements.txt
+*.pyc
+__pycache__/
+*.egg-info/
+
+# Docker and config files
+docker-compose.yml
+Dockerfile
+*.dockerfile
+
+# Other
+README.md
+LICENSE
+run.py
+
+# Only include frontend directory
+# Vercel will only deploy what's NOT in this ignore list
+
