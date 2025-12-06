@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import os
 from abc import ABC, abstractmethod
-from typing import Optional
+from typing import AsyncIterator, Optional
 
 # Provider imports (optional, fail gracefully if not installed)
 try:
@@ -44,6 +44,22 @@ class LLMProvider(ABC):
     def enabled(self) -> bool:
         """Check if provider is enabled"""
         pass
+    
+    async def stream_generate(
+        self,
+        prompt: str,
+        system_prompt: Optional[str] = None,
+        temperature: float = 0.7,
+        max_tokens: Optional[int] = None,
+    ) -> AsyncIterator[str]:
+        """
+        Stream generate text from prompt (default implementation uses generate).
+        
+        Subclasses should override this for true streaming support.
+        """
+        # Default: fallback to non-streaming generate
+        result = self.generate(prompt, system_prompt, temperature, max_tokens)
+        yield result
 
 
 class GeminiProvider(LLMProvider):
@@ -100,6 +116,55 @@ class GeminiProvider(LLMProvider):
             return response.text.strip()
         except Exception as e:
             raise RuntimeError(f"Gemini generation failed: {e}")
+    
+    async def stream_generate(
+        self,
+        prompt: str,
+        system_prompt: Optional[str] = None,
+        temperature: float = 0.7,
+        max_tokens: Optional[int] = None,
+    ) -> AsyncIterator[str]:
+        """Stream generate text from prompt using Gemini streaming API"""
+        if not self._enabled:
+            raise RuntimeError("Gemini client is disabled (missing API key or dependency)")
+
+        # Combine system prompt and user prompt
+        full_prompt = prompt
+        if system_prompt:
+            full_prompt = f"{system_prompt}\n\n{prompt}"
+
+        try:
+            model = genai.GenerativeModel(self.model)
+            generation_config = {
+                "temperature": temperature,
+            }
+            if max_tokens:
+                generation_config["max_output_tokens"] = max_tokens
+
+            # Use stream=True for streaming
+            response = model.generate_content(
+                full_prompt,
+                generation_config=genai.types.GenerationConfig(**generation_config),
+                stream=True,
+            )
+            
+            # Yield chunks as they arrive (convert sync iterator to async)
+            # Gemini returns sync iterator, so we need to yield in async context
+            import asyncio
+            chunk_count = 0
+            for chunk in response:
+                if chunk.text:
+                    chunk_count += 1
+                    # Debug logging
+                    print(f"[GEMINI] Chunk #{chunk_count}: {repr(chunk.text[:50])}")
+                    # Yield immediately to allow other tasks to run
+                    yield chunk.text
+                    # Small delay to ensure proper async behavior
+                    await asyncio.sleep(0)
+            
+            print(f"[GEMINI] Streaming completed: {chunk_count} chunks")
+        except Exception as e:
+            raise RuntimeError(f"Gemini streaming failed: {e}")
 
 
 class OllamaProvider(LLMProvider):
@@ -170,3 +235,42 @@ class OllamaProvider(LLMProvider):
             return response["response"].strip()
         except Exception as e:
             raise RuntimeError(f"Ollama generation failed: {e}. Make sure Ollama is running at {self.base_url}")
+    
+    async def stream_generate(
+        self,
+        prompt: str,
+        system_prompt: Optional[str] = None,
+        temperature: float = 0.7,
+        max_tokens: Optional[int] = None,
+    ) -> AsyncIterator[str]:
+        """Stream generate text from prompt using Ollama streaming API"""
+        if not self.enabled or ollama is None:
+            raise RuntimeError("Ollama client is disabled (not installed or not running)")
+
+        # Combine system prompt and user prompt
+        full_prompt = prompt
+        if system_prompt:
+            full_prompt = f"{system_prompt}\n\n{prompt}"
+
+        try:
+            # Use stream=True for streaming
+            stream = ollama.generate(
+                model=self.model,
+                prompt=full_prompt,
+                options={
+                    "temperature": temperature,
+                    "num_predict": max_tokens or 512,
+                },
+                base_url=self.base_url,
+                stream=True,
+            )
+            
+            # Yield chunks as they arrive (convert sync iterator to async)
+            import asyncio
+            for chunk in stream:
+                if "response" in chunk:
+                    yield chunk["response"]
+                    # Small delay to ensure proper async behavior
+                    await asyncio.sleep(0)
+        except Exception as e:
+            raise RuntimeError(f"Ollama streaming failed: {e}. Make sure Ollama is running at {self.base_url}")

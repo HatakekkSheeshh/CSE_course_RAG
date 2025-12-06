@@ -117,6 +117,63 @@ def get_rag_only_course() -> str | None:
 
 
 # ============================================================================
+# Prompt Templates Configuration
+# ============================================================================
+
+def get_rag_system_prompt() -> str:
+    """
+    Get system prompt for RAG answer generation.
+    
+    Can be overridden via RAG_SYSTEM_PROMPT environment variable.
+    """
+    default_prompt = (
+        "You are a helpful assistant that answers questions about CSE course materials and syllabuses in Ho Chi Minh university of Technology. "
+        "If they do not contain the answer, respond with your own creative answer. "
+        "Make the sentences natural and concise."
+    )
+    return os.getenv("RAG_SYSTEM_PROMPT", default_prompt)
+
+
+def get_rag_system_prompt_with_history() -> str:
+    """
+    Get system prompt for RAG answer generation with conversation history support.
+    
+    Can be overridden via RAG_SYSTEM_PROMPT_WITH_HISTORY environment variable.
+    """
+    default_prompt = (
+        "You are a helpful assistant that answers questions about CSE course materials and syllabuses in Ho Chi Minh university of Technology. "
+        "If they do not contain the answer, respond with your own creative answer. "
+        "Make the sentences natural and concise. "
+        "Use the conversation history to understand context and provide coherent follow-up answers."
+    )
+    return os.getenv("RAG_SYSTEM_PROMPT_WITH_HISTORY", default_prompt)
+
+
+def format_rag_prompt(
+    query: str,
+    contexts: list[str],
+    conversation_history: str | None = None,
+) -> str:
+    """
+    Format RAG prompt with contexts and optional conversation history.
+    
+    Args:
+        query: User question
+        contexts: List of retrieved context chunks
+        conversation_history: Optional formatted conversation history
+        
+    Returns:
+        Formatted prompt string
+    """
+    context_block = "\n\n".join(f"- {ctx.strip()}" for ctx in contexts if ctx.strip())
+    
+    if conversation_history:
+        return f"Context from course documents:\n{context_block}\n\nPrevious conversation:\n{conversation_history}\n\nQuestion: {query}"
+    else:
+        return f"Context from course documents:\n{context_block}\n\nQuestion: {query}"
+
+
+# ============================================================================
 # API Configuration
 # ============================================================================
 

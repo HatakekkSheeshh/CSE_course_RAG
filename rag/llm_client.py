@@ -8,7 +8,7 @@ Supports:
 
 from __future__ import annotations
 
-from typing import List, Optional
+from typing import AsyncIterator, List, Optional
 
 import config
 from rag.llm_provider import GeminiProvider, OllamaProvider, LLMProvider
@@ -117,6 +117,25 @@ class LLMClient:
             temperature=temperature,
             max_tokens=max_tokens,
         )
+    
+    async def stream_generate(
+        self,
+        prompt: str,
+        system_prompt: Optional[str] = None,
+        temperature: float = 0.7,
+        max_tokens: Optional[int] = None,
+    ) -> AsyncIterator[str]:
+        """Stream generate text from prompt"""
+        if not self._enabled or not self._provider:
+            raise RuntimeError(f"{self.provider_name} client is disabled")
+
+        async for chunk in self._provider.stream_generate(
+            prompt=prompt,
+            system_prompt=system_prompt,
+            temperature=temperature,
+            max_tokens=max_tokens,
+        ):
+            yield chunk
 
     def generate_answer(
         self,
@@ -124,26 +143,85 @@ class LLMClient:
         contexts: List[str],
         *,
         system_prompt: Optional[str] = None,
+        conversation_history: Optional[str] = None,
     ) -> str:
         """
-        Generate answer from query and contexts (backward compatibility).
+        Generate answer from query and contexts.
         
-        This method maintains the original API for answer generation.
+        Args:
+            query: User question
+            contexts: List of retrieved context chunks
+            system_prompt: Optional custom system prompt
+            conversation_history: Optional formatted conversation history
+            
+        Returns:
+            Generated answer string
         """
         if not self._enabled or not self._provider:
             raise RuntimeError(f"{self.provider_name} client is disabled")
 
-        context_block = "\n\n".join(f"- {ctx.strip()}" for ctx in contexts if ctx.strip())
-        system_prompt = system_prompt or (
-            "You are a helpful assistant that answers questions about CSE course materials and syllabuses in Ho Chi Minh university of Technology. "
-            "If they do not contain the answer, respond with your own creative answer."
-            "Make the sentences natural and concise."
-        )
+        # Use system prompt from config if not provided
+        # Use history-aware prompt if history is provided
+        if system_prompt is None:
+            if conversation_history:
+                system_prompt = config.get_rag_system_prompt_with_history()
+            else:
+                system_prompt = config.get_rag_system_prompt()
 
-        prompt = f"Context:\n{context_block}\n\nQuestion: {query}"
+        # Format prompt using config helper (supports history)
+        prompt = config.format_rag_prompt(
+            query=query,
+            contexts=contexts,
+            conversation_history=conversation_history,
+        )
 
         return self._provider.generate(
             prompt=prompt,
             system_prompt=system_prompt,
             temperature=0.2,
         )
+    
+    async def stream_generate_answer(
+        self,
+        query: str,
+        contexts: List[str],
+        *,
+        system_prompt: Optional[str] = None,
+        conversation_history: Optional[str] = None,
+    ) -> AsyncIterator[str]:
+        """
+        Stream generate answer from query and contexts.
+        
+        Args:
+            query: User question
+            contexts: List of retrieved context chunks
+            system_prompt: Optional custom system prompt
+            conversation_history: Optional formatted conversation history
+            
+        Yields:
+            Answer tokens as they are generated
+        """
+        if not self._enabled or not self._provider:
+            raise RuntimeError(f"{self.provider_name} client is disabled")
+
+        # Use system prompt from config if not provided
+        # Use history-aware prompt if history is provided
+        if system_prompt is None:
+            if conversation_history:
+                system_prompt = config.get_rag_system_prompt_with_history()
+            else:
+                system_prompt = config.get_rag_system_prompt()
+
+        # Format prompt using config helper (supports history)
+        prompt = config.format_rag_prompt(
+            query=query,
+            contexts=contexts,
+            conversation_history=conversation_history,
+        )
+
+        async for chunk in self._provider.stream_generate(
+            prompt=prompt,
+            system_prompt=system_prompt,
+            temperature=0.2,
+        ):
+            yield chunk

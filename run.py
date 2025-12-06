@@ -27,7 +27,7 @@ except ImportError:
 
 # ---------------------------------------------------------------------
 # Time helper
-def now_iso(tz_name: str | None = "Asia/Ho_Chi_Minh") -> str:
+def now_iso(tz_name: str | None = "Asia/Ho_Chi_zMinh") -> str:
     if tz_name and ZoneInfo is not None:
         tz = ZoneInfo(tz_name)
     else:
