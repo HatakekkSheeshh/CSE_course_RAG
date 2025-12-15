@@ -35,4 +35,7 @@ watchfiles>=0.24
 python-dotenv  # Environment variable management
 
 # optional: qdrant support
-qdrant-client
+# qdrant-client
+
+# evaluation
+rouge-score

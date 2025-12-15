@@ -85,17 +85,15 @@ conversation_manager = ConversationManager()
 
 @lru_cache(maxsize=1)
 def get_pipeline() -> QueryPipeline:
-    # Get configuration from centralized config module
+
     rag_config = config.get_rag_pipeline_config()
 
-    # Create query rewriter if available
     query_rewriter = None
     if create_query_rewriter is not None:
         try:
             llm_client = get_llm_client()
             query_rewriter = create_query_rewriter(llm_client=llm_client)
         except Exception:
-            # Query rewriting is optional, continue without it
             pass
 
     return QueryPipeline(
@@ -184,11 +182,9 @@ def list_courses() -> CoursesResponse:
 def query_rag(payload: QueryRequest) -> QueryResponse:
     # Generate session_id if not provided
     import uuid
-    
-    # If start_new_conversation is True, create new session or clear existing one
+
     if payload.start_new_conversation:
         if payload.session_id:
-            # Clear history for existing session
             conversation_manager.clear_history(payload.session_id)
         session_id = str(uuid.uuid4())  # Always create new session
     else:

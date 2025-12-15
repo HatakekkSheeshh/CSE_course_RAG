@@ -47,12 +47,13 @@ class QueryRewriter:
         """Check if rewriting is available (LLM enabled and configured)."""
         return self.enabled and self.llm_client.enabled
 
-    def rewrite(self, query: str) -> str:
+    def rewrite(self, query: str, course: Optional[str] = None) -> str:
         """
         Rewrite query to be more searchable.
         
         Args:
             query: Original user query
+            course: Optional course name to preserve in rewritten query
             
         Returns:
             Rewritten query, or original query if rewriting is disabled/fails
@@ -61,7 +62,7 @@ class QueryRewriter:
             return query
 
         try:
-            prompt = self._build_rewrite_prompt(query)
+            prompt = self._build_rewrite_prompt(query, course)
             rewritten = self._call_llm(prompt)
             
             # Validate rewritten query
@@ -76,22 +77,30 @@ class QueryRewriter:
             print(f"Query rewriting failed: {e}, using original query")
             return query
 
-    def _build_rewrite_prompt(self, query: str) -> str:
+    def _build_rewrite_prompt(self, query: str, course: Optional[str] = None) -> str:
         """Build the prompt for query rewriting."""
+        course_context = ""
+        if course:
+            # Convert course folder name to readable format (e.g., Database_Systems -> Database Systems)
+            course_name = course.replace("_", " ")
+            course_context = f"\n\nCRITICAL: This question is specifically about the course '{course_name}'. You MUST:\n- Preserve the course name '{course_name}' EXACTLY in the rewritten question\n- Focus the rewritten question on content from this specific course\n- Do NOT remove or change the course name"
+        
         return f"""Rewrite the following question about a CSE (Computer Science and Engineering) course to be more specific and searchable in course documents.
 
-Extract key concepts, expand synonyms, and clarify intent. Focus on course-related terminology such as:
-- Course topics, content, and learning objectives
-- Prerequisites and required background knowledge
-- Grading criteria, assessment methods, and evaluation
-- Assignments, projects, and coursework requirements
-- Course structure, schedule, and policies
+CRITICAL RULES - YOU MUST FOLLOW ALL OF THESE:
+1. PRESERVE ALL KEY INFORMATION: Keep every important word, concept, and detail from the original question
+2. MAINTAIN QUESTION STRUCTURE: The rewritten question must be a complete, grammatically correct question
+3. PRESERVE LENGTH: The rewritten question should be AT LEAST as long as the original (preferably longer with more detail)
+4. DO NOT SHORTEN: Never make the question shorter or remove information
+5. EXPAND WISELY: You can add synonyms, clarify intent, and add relevant terminology, but ONLY if it helps retrieval
+6. KEEP KEY TERMS: Preserve exact course names, technical terms, and important keywords
+7. Focus on course-related terminology such as: prerequisites, grading, topics, learning objectives, assignments, course structure
 
-Keep the rewritten question concise (1-2 sentences) and natural.
+{course_context}
 
 Original question: {query}
 
-Rewritten question:"""
+Rewritten question (MUST be a complete question that preserves ALL key information and is at least as long as the original):"""
 
     def _call_llm(self, prompt: str) -> str:
         """Call LLM to rewrite the query."""
@@ -100,7 +109,9 @@ Rewritten question:"""
 
         system_prompt = (
             "You are a query rewriter for educational content search. "
-            "Rewrite questions to be more specific and searchable while preserving the original intent."
+            "Your task is to rewrite questions to be more specific and searchable while PRESERVING ALL KEY INFORMATION from the original question. "
+            "CRITICAL: The rewritten question must be AT LEAST as long as the original, contain all key terms, and be a complete, grammatically correct question. "
+            "Never shorten or remove information - only expand and clarify."
         )
 
         return self.llm_client.generate(

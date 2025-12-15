@@ -115,7 +115,7 @@ class QueryPipeline:
         # Rewrite query if rewriter is available
         search_query = query
         if self.query_rewriter and self.query_rewriter.is_available:
-            search_query = self.query_rewriter.rewrite(query)
+            search_query = self.query_rewriter.rewrite(query, course=course)
 
         query_embedding = np.array(self.embedding.embed(search_query), dtype="float32")
         all_results: List[RetrievedChunk] = []
@@ -148,12 +148,25 @@ class QueryPipeline:
         return sorted(all_results, key=lambda r: r.score, reverse=True)
 
     # ------------------------------------------------------------------ #
-    def rerank(self, query: str, retrieved: Sequence[RetrievedChunk]) -> List[RerankResult]:
+    def rerank(self, query: str, retrieved: Sequence[RetrievedChunk], course: Optional[str] = None) -> List[RerankResult]:
+        """
+        Rerank retrieved chunks using cross-encoder.
+        
+        Args:
+            query: Original user query (will be rewritten if rewriter is available)
+            retrieved: Retrieved chunks to rerank
+            course: Optional course name for query rewriting
+        """
+        # Use rewritten query for reranking if available (consistent with retrieval)
+        rerank_query = query
+        if self.query_rewriter and self.query_rewriter.is_available:
+            rerank_query = self.query_rewriter.rewrite(query, course=course)
+        
         top_candidates = list(retrieved)[: self.rerank_k]
         passages = [
             (chunk.chunk_id, chunk.text, chunk.metadata) for chunk in top_candidates if chunk.text
         ]
-        return self.reranker.score(query, passages)
+        return self.reranker.score(rerank_query, passages)
 
     # ------------------------------------------------------------------ #
     def answer(self, query: str, course: Optional[str] = None) -> Dict:
@@ -166,7 +179,7 @@ class QueryPipeline:
                 "retrieved": [],
             }
 
-        reranked = self.rerank(query, retrieved)
+        reranked = self.rerank(query, retrieved, course=course)
         if not reranked:
             return {
                 "status": "no_info",

@@ -1,29 +1,16 @@
-"""
-Centralized configuration management.
-
-Loads environment variables from .env file once at module import.
-All other modules should import from this config instead of using os.getenv directly.
-"""
-
 from __future__ import annotations
 
 import os
 from pathlib import Path
 
-# Load .env file once at module import
 try:
     from dotenv import load_dotenv
-    
-    # Load .env from project root
     env_path = Path(__file__).parent / ".env"
     if env_path.exists():
         load_dotenv(env_path)
     else:
-        # Try loading from current directory
         load_dotenv()
 except ImportError:
-    # python-dotenv not installed, continue without it
-    # Environment variables should be set manually or via system
     pass
 
 
@@ -32,7 +19,17 @@ except ImportError:
 # ============================================================================
 
 def get_llm_provider() -> str:
-    """Get LLM provider (gemini or ollama)."""
+    """
+    Get LLM provider (gemini or ollama).
+    
+    Checks MODEL_USING first (new flag), then falls back to LLM_PROVIDER (legacy).
+    """
+    # Check MODEL_USING first (new, clearer flag)
+    model_using = os.getenv("MODEL_USING", "").lower()
+    if model_using in ("gemini", "ollama"):
+        return model_using
+    
+    # Fallback to LLM_PROVIDER (legacy support)
     provider = os.getenv("LLM_PROVIDER", "gemini").lower()
     # Validate and fallback to gemini if invalid
     if provider not in ("gemini", "ollama"):
@@ -71,12 +68,12 @@ def get_query_rewriting_enabled() -> bool:
 
 def get_query_rewriter_temperature() -> float:
     """Get query rewriter temperature."""
-    return float(os.getenv("QUERY_REWRITER_TEMPERATURE", "0.3"))
+    return float(os.getenv("QUERY_REWRITER_TEMPERATURE", "0.1"))  # Lower for more deterministic rewriting
 
 
 def get_query_rewriter_max_tokens() -> int:
     """Get query rewriter max tokens."""
-    return int(os.getenv("QUERY_REWRITER_MAX_TOKENS", "100"))
+    return int(os.getenv("QUERY_REWRITER_MAX_TOKENS", "250"))  # Increased to allow longer rewritten queries
 
 
 # ============================================================================

@@ -115,6 +115,15 @@ class GeminiProvider(LLMProvider):
             )
             return response.text.strip()
         except Exception as e:
+            error_msg = str(e)
+            # Check for quota/rate limit errors
+            if "429" in error_msg or "quota" in error_msg.lower() or "rate limit" in error_msg.lower():
+                raise RuntimeError(
+                    f"Gemini API quota exceeded. "
+                    f"Free tier limit: 20 requests/day. "
+                    f"Solutions: 1) Wait 24 hours for quota reset, 2) Switch to Ollama (local, unlimited), "
+                    f"3) Upgrade to paid plan. Error: {e}"
+                )
             raise RuntimeError(f"Gemini generation failed: {e}")
     
     async def stream_generate(
@@ -164,6 +173,15 @@ class GeminiProvider(LLMProvider):
             
             print(f"[GEMINI] Streaming completed: {chunk_count} chunks")
         except Exception as e:
+            error_msg = str(e)
+            # Check for quota/rate limit errors
+            if "429" in error_msg or "quota" in error_msg.lower() or "rate limit" in error_msg.lower():
+                raise RuntimeError(
+                    f"Gemini API quota exceeded. "
+                    f"Free tier limit: 20 requests/day. "
+                    f"Solutions: 1) Wait 24 hours for quota reset, 2) Switch to Ollama (local, unlimited), "
+                    f"3) Upgrade to paid plan. Error: {e}"
+                )
             raise RuntimeError(f"Gemini streaming failed: {e}")
 
 
@@ -189,23 +207,77 @@ class OllamaProvider(LLMProvider):
         self.base_url = base_url or os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
         self.model = model or os.getenv("OLLAMA_MODEL", "llama2")
         self._enabled = False
+        self._client = None
 
         if ollama is None:
             return
 
-        # Test connection to local Ollama service
+        # Create Ollama client with base_url
+        # Parse base_url to extract host and port
+        # Handle formats like: http://localhost:11434, http://ollama:11434, localhost:11434
+        url = self.base_url.replace("http://", "").replace("https://", "")
+        if ":" in url:
+            host, port_str = url.rsplit(":", 1)
+            try:
+                port = int(port_str)
+            except ValueError:
+                host = url
+                port = 11434
+        else:
+            host = url
+            port = 11434
+        
+        # Store host and port for later use
+        self._ollama_host = host
+        self._ollama_port = port
+        
+        # Ollama Python library uses OLLAMA_HOST environment variable for connection
+        # Format: host:port (no http://)
+        # Set it permanently for this client instance
+        ollama_host_value = f"{host}:{port}"
+        old_ollama_host = os.environ.get("OLLAMA_HOST")
+        
+        # Set OLLAMA_HOST if it's different from current value
+        if os.environ.get("OLLAMA_HOST") != ollama_host_value:
+            os.environ["OLLAMA_HOST"] = ollama_host_value
+        
+        # Create client - Ollama library reads from OLLAMA_HOST env var
+        self._client = None
         try:
-            # Simple check - try to list models from local service
-            ollama.list(base_url=self.base_url)
-            self._enabled = True
-        except Exception:
-            # Ollama might not be running, but we'll try anyway
-            # Will fail at generation if service is not available
-            self._enabled = True
+            # Try different initialization methods
+            try:
+                # Method 1: Try Client(host=host, port=port) - newer API
+                self._client = ollama.Client(host=host, port=port)
+            except (TypeError, AttributeError):
+                try:
+                    # Method 2: Try Client(host=host) - port defaults to 11434
+                    self._client = ollama.Client(host=host)
+                except (TypeError, AttributeError):
+                    # Method 3: Use default client (reads from OLLAMA_HOST env var)
+                    self._client = ollama.Client()
+            
+            # Test connection by listing models
+            try:
+                self._client.list()
+                self._enabled = True
+            except Exception as conn_error:
+                # Connection test failed
+                print(f"Warning: Could not connect to Ollama at {self.base_url}: {conn_error}")
+                self._enabled = False
+                # Client is created but connection will fail at generation time
+        except Exception as e:
+            # Client creation failed
+            print(f"Warning: Failed to create Ollama client: {e}")
+            self._enabled = False
+            # Try to create default client as fallback
+            try:
+                self._client = ollama.Client()
+            except Exception:
+                self._client = None
 
     @property
     def enabled(self) -> bool:
-        return self._enabled and ollama is not None
+        return self._enabled and ollama is not None and self._client is not None
 
     def generate(
         self,
@@ -223,14 +295,14 @@ class OllamaProvider(LLMProvider):
             full_prompt = f"{system_prompt}\n\n{prompt}"
 
         try:
-            response = ollama.generate(
+            # Use client instance instead of passing base_url
+            response = self._client.generate(
                 model=self.model,
                 prompt=full_prompt,
                 options={
                     "temperature": temperature,
                     "num_predict": max_tokens or 512,
                 },
-                base_url=self.base_url,
             )
             return response["response"].strip()
         except Exception as e:
@@ -254,14 +326,13 @@ class OllamaProvider(LLMProvider):
 
         try:
             # Use stream=True for streaming
-            stream = ollama.generate(
+            stream = self._client.generate(
                 model=self.model,
                 prompt=full_prompt,
                 options={
                     "temperature": temperature,
                     "num_predict": max_tokens or 512,
                 },
-                base_url=self.base_url,
                 stream=True,
             )
             

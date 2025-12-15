@@ -48,19 +48,22 @@ GEMINI_MODEL=gemini-pro
 ```env
 LLM_PROVIDER=ollama
 OLLAMA_MODEL=llama2  # Install: ollama pull llama2
-OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_BASE_URL=http://localhost:11434  # Use host.docker.internal:11434 when running in Docker
+```
+
+**Note for Docker users:** If running the backend in Docker and Ollama is running separately on Docker Desktop, use:
+```env
+OLLAMA_BASE_URL=http://host.docker.internal:11434  # Windows/Mac Docker Desktop
+# OR
+OLLAMA_BASE_URL=http://ollama:11434  # If Ollama is in the same docker-compose network
 ```
 
 **Query Rewriting** (optional but recommended):
 ```env
 ENABLE_QUERY_REWRITING=true          # Enable query rewriting (default: true)
-QUERY_REWRITER_TEMPERATURE=0.3       # LLM temperature for rewriting (default: 0.3)
+QUERY_REWRITER_TEMPERATURE=0.7       # LLM temperature for rewriting (default: 0.7)
 QUERY_REWRITER_MAX_TOKENS=100        # Max tokens for rewritten query (default: 100)
 ```
-
-**Free LLM Options**: See `docs/free-llm-providers-guide.md` for setup instructions.
-
-(Optional) override `RAG_DATA_DIR`, `RAG_INDEX_DIR`, etc.
 
 ### 2. Start Services
 ```bash
@@ -108,6 +111,15 @@ All CLI steps are orchestrated via `run.py` and expect the `data/` workspace:
 | `curl http://localhost:8000/courses` | List available courses |
 
 Populate `data/raw/<CourseName>/` with PDFs before running the pipeline.
+
+---
+
+## Evaluation
+
+Evaluate RAG system performance (requires `pip install rouge-score`): `python3 scripts/evaluate_rag_system.py --queries scripts/test_queries.json --output scripts/evaluation_results.json`.  
+Fill LaTeX tables from results: `python3 scripts/fill_results_tables.py --results scripts/evaluation_results.json --tex overleaf-report/AI_PROJECT_REPORT/experiements/results.tex`.  
+Create visualizations (requires `pip install matplotlib numpy`): `python3 scripts/create_visualizations.py --results scripts/evaluation_results.json --output-dir overleaf-report/AI_PROJECT_REPORT/figures`.  
+Additional analysis scripts: `scripts/collect_dataset_stats.py`, `scripts/analyze_parsed_data_quality.py`.
 
 ---
 

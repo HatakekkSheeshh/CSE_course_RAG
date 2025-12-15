@@ -1,4 +1,26 @@
 services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: cse_course_rag_ollama_1 
+    profiles:
+      - ollama  
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    restart: unless-stopped
+    mem_limit: 8g           
+    cpus: 4.0               
+    environment:
+      - OLLAMA_NUM_GPU=1   
+      - OLLAMA_MAX_LOADED_MODELS=1  
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:11434/api/tags || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
   backend:
     build:
       context: ./api
@@ -7,9 +29,10 @@ services:
     environment:
       - GEMINI_API_KEY=${GEMINI_API_KEY}
       - GEMINI_MODEL=${GEMINI_MODEL}
-      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL}
-      - OLLAMA_MODEL=${OLLAMA_MODEL}
-      - LLM_PROVIDER=${LLM_PROVIDER}
+      - OLLAMA_BASE_URL=${OLLAMA_BASE_URL:-http://ollama:11434}  # Use service name 'ollama' in docker-compose network
+      - OLLAMA_MODEL=${OLLAMA_MODEL:-llama2}
+      - MODEL_USING=${MODEL_USING:-ollama}
+      - LLM_PROVIDER=${LLM_PROVIDER:-${MODEL_USING:-ollama}}
       - RAG_DATA_DIR=${RAG_DATA_DIR:-/workspace/data}
       - RAG_INDEX_DIR=${RAG_INDEX_DIR:-/workspace/data/indices}
     volumes:
@@ -17,13 +40,12 @@ services:
     working_dir: /workspace
     ports:
       - "8000:8000"
-
   frontend:
     build:
       context: ./frontend
     image: cse_course_rag_frontend:latest
     environment:
-      - VITE_API_BASE_URL=${VITE_API_BASE_URL}
+      - VITE_API_BASE_URL=${VITE_API_BASE_URL:-http://localhost:8000/api}
       - CHOKIDAR_USEPOLLING=1
     ports:
       - "5173:5173"
@@ -32,3 +54,6 @@ services:
       - /app/node_modules
     depends_on:
       - backend
+
+volumes:
+  ollama_data:

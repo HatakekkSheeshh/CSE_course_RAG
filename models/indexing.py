@@ -40,7 +40,7 @@ def add_documents(
         embeddings: Numpy array of shape (n_docs, embedding_dim)
         ids: List of chunk IDs corresponding to embeddings
     """
-    # Normalize embeddings for cosine similarity (Inner Product)
+    # Normalize to vector unit
     norms = np.linalg.norm(embeddings, axis=1, keepdims=True)
     norms[norms == 0] = 1  # Avoid division by zero
     normalized_embeddings = embeddings / norms
