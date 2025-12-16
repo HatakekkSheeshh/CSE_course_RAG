@@ -1,0 +1,53 @@
+[
+  {
+    "query": "prerequisites?",
+    "course": "Introduction_to_Computing",
+    "query_type": "course_info",
+    "note": "Short query without course name - rewriter should expand and add course context. No reference answer - internal HCMUT data, evaluation uses retrieval metrics only"
+  },
+  {
+    "query": "prerequisites?",
+    "reference_answer": "Principles of Programming Languages (CO3005) requires CO1027 Programming Fundamentals as a prerequisite (TQ - prerequisite).",
+    "course": "Principles_of_Programming_Languages",
+    "query_type": "course_info",
+    "note": "Short query without course name - rewriter should expand and add course context"
+  },
+  {
+    "query": "grading",
+    "reference_answer": "Introduction to Computing (CO1005) grading policy: Midterm exam 30%, Final exam 30%, Labs/Practices 10%, Projects 30%. Students must complete assignments to be eligible to take the exam.",
+    "course": "Introduction_to_Computing",
+    "query_type": "course_info",
+    "note": "Very short query without course name - rewriter should expand to 'grading policy' and add course context"
+  },
+  {
+    "query": "grading",
+    "reference_answer": "Principles of Programming Languages (CO3005) grading policy: Midterm exam 20%, Final exam 40%, Tutorial 10%, Projects 30%.",
+    "course": "Principles_of_Programming_Languages",
+    "query_type": "course_info",
+    "note": "Very short query without course name - rewriter should expand to 'grading policy' and add course context"
+  },
+  {
+    "query": "topics?",
+    "course": "Introduction_to_Computing",
+    "query_type": "course_info",
+    "note": "Short query without course name - rewriter should expand to 'topics covered' and add course context. No reference answer - internal HCMUT data, evaluation uses retrieval metrics only"
+  },
+  {
+    "query": "topics?",
+    "course": "Principles_of_Programming_Languages",
+    "query_type": "course_info",
+    "note": "Short query without course name - rewriter should expand to 'topics covered' and add course context. No reference answer - internal HCMUT data, evaluation uses retrieval metrics only"
+  },
+  {
+    "query": "objectives",
+    "course": "Introduction_to_Computing",
+    "query_type": "course_info",
+    "note": "Short query without course name - rewriter should expand to 'learning objectives' and add course context. No reference answer - internal HCMUT data, evaluation uses retrieval metrics only"
+  },
+  {
+    "query": "assignments",
+    "course": "Principles_of_Programming_Languages",
+    "query_type": "course_info",
+    "note": "Ambiguous query without course name - rewriter should disambiguate to 'assignments, homework, projects' and add course context. No reference answer - internal HCMUT data, evaluation uses retrieval metrics only"
+  }
+]
