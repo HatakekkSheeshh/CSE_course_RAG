@@ -2,8 +2,6 @@ services:
   ollama:
     image: ollama/ollama:latest
     container_name: cse_course_rag_ollama_1 
-    profiles:
-      - ollama  
     volumes:
       - ollama_data:/root/.ollama
     ports:

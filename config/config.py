@@ -20,21 +20,29 @@ except ImportError:
 
 def get_llm_provider() -> str:
     """
-    Get LLM provider (gemini or ollama).
+    Get LLM provider (gemini, ollama, or qwen).
     
     Checks MODEL_USING first (new flag), then falls back to LLM_PROVIDER (legacy).
+    Note: 'qwen' uses Ollama under the hood with qwen model.
     """
     # Check MODEL_USING first (new, clearer flag)
     model_using = os.getenv("MODEL_USING", "").lower()
-    if model_using in ("gemini", "ollama"):
+    if model_using in ("gemini", "ollama", "qwen"):
         return model_using
     
     # Fallback to LLM_PROVIDER (legacy support)
     provider = os.getenv("LLM_PROVIDER", "gemini").lower()
     # Validate and fallback to gemini if invalid
-    if provider not in ("gemini", "ollama"):
+    if provider not in ("gemini", "ollama", "qwen"):
         return "gemini"
     return provider
+
+
+def get_qwen_config() -> tuple[str, str]:
+    """Get Qwen configuration: (model, base_url). Uses Ollama as backend."""
+    model = os.getenv("QWEN_MODEL", "qwen2.5:3b")
+    base_url = os.getenv("QWEN_BASE_URL", os.getenv("OLLAMA_BASE_URL", "http://localhost:11434"))
+    return model, base_url
 
 
 def get_gemini_config() -> tuple[str, str]:
@@ -189,7 +197,7 @@ def get_llm_provider_config() -> dict:
     Get complete LLM provider configuration.
     
     Returns:
-        dict with keys: provider, model, api_key (for Gemini), base_url (for Ollama)
+        dict with keys: provider, model, api_key (for Gemini), base_url (for Ollama/Qwen)
     """
     provider = get_llm_provider()
     config = {"provider": provider}
@@ -200,6 +208,10 @@ def get_llm_provider_config() -> dict:
     elif provider == "ollama":
         model, base_url = get_ollama_config()
         config.update({"model": model, "base_url": base_url})
+    elif provider == "qwen":
+        model, base_url = get_qwen_config()
+        # Qwen uses Ollama backend, so we mark it as ollama internally
+        config.update({"model": model, "base_url": base_url, "backend": "ollama"})
     
     return config
 
