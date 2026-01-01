@@ -33,6 +33,20 @@ Retrieval-Augmented Generation system for CSE course materials. Documents are pr
 - Docker Desktop (WSL2 recommended on Windows)
 - LLM API key (see free options below)
 
+### 0. Download Dataset
+
+Before running the project, download the pre-built FAISS indices and processed data from HuggingFace:
+
+```bash
+python dataset.py
+```
+
+This will download the dataset from [`hatakekksheeshh/CSE_course_RAG`](https://huggingface.co/datasets/hatakekksheeshh/CSE_course_RAG) and set up the `data/` folder with:
+- `indices/` – Pre-built FAISS indices
+- `processed/` – Processed course data
+- `raw/` – Raw PDF documents
+- `converted/` – Converted images
+
 ### 1. Configure Environment
 
 Create a `.env` file in the project root (copy from `.env.example`):

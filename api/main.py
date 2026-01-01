@@ -124,11 +124,18 @@ def get_llm_client() -> LLMClient:
             model=llm_config["model"],
             base_url=llm_config["base_url"],
         )
+    elif provider == "qwen":
+        # Qwen uses Ollama as backend
+        return LLMClient(
+            provider=provider,
+            model=llm_config["model"],
+            base_url=llm_config["base_url"],
+        )
     else:
         # This should never happen due to validation in config, but just in case
         raise HTTPException(
             status_code=400,
-            detail=f"Unsupported provider: {provider}. Supported: 'gemini', 'ollama'"
+            detail=f"Unsupported provider: {provider}. Supported: 'gemini', 'ollama', 'qwen'"
         )
 
 def build_source_chunks(

@@ -11,7 +11,7 @@ from __future__ import annotations
 from typing import AsyncIterator, List, Optional
 
 import config
-from rag.llm_provider import GeminiProvider, OllamaProvider, LLMProvider
+from rag.llm_provider import GeminiProvider, OllamaProvider, QwenProvider, LLMProvider
 
 
 class LLMClient:
@@ -56,27 +56,34 @@ class LLMClient:
                 model, _ = config.get_gemini_config()
             elif provider == "ollama":
                 model, _ = config.get_ollama_config()
+            elif provider == "qwen":
+                model, _ = config.get_qwen_config()
         
         # Get API key from config if not provided (for Gemini)
         if provider == "gemini" and api_key is None:
             _, api_key = config.get_gemini_config()
         
-        # Get base_url from config if not provided (for Ollama)
+        # Get base_url from config if not provided (for Ollama/Qwen)
         if provider == "ollama" and base_url is None:
             _, base_url = config.get_ollama_config()
+        elif provider == "qwen" and base_url is None:
+            _, base_url = config.get_qwen_config()
 
-        print(f"[LLMClient] Using model: {model}")
+        print(f"[LLMClient] Using provider: {provider}, model: {model}")
 
         # Initialize provider
         if self.provider_name == "gemini":
             self._provider = GeminiProvider(api_key=api_key, model=model)
         elif self.provider_name == "ollama":
             self._provider = OllamaProvider(base_url=base_url, model=model)
+        elif self.provider_name == "qwen":
+            # Qwen provider (uses Ollama backend but with Qwen-specific handling)
+            self._provider = QwenProvider(base_url=base_url, model=model)
         else:
             # Provide clear error message
             raise ValueError(
-                f"Unknown provider: '{provider}'. Supported providers: 'gemini', 'ollama'. "
-                f"Please set LLM_PROVIDER environment variable to 'gemini' or 'ollama'."
+                f"Unknown provider: '{provider}'. Supported providers: 'gemini', 'ollama', 'qwen'. "
+                f"Please set MODEL_USING environment variable to 'gemini', 'ollama', or 'qwen'."
             )
 
         self._enabled = self._provider.enabled if self._provider else False
@@ -92,6 +99,8 @@ class LLMClient:
         if self.provider_name == "gemini" and isinstance(self._provider, GeminiProvider):
             return self._provider.model
         elif self.provider_name == "ollama" and isinstance(self._provider, OllamaProvider):
+            return self._provider.model
+        elif self.provider_name == "qwen" and isinstance(self._provider, QwenProvider):
             return self._provider.model
         return "unknown"
 
