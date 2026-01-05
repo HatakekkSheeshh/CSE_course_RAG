@@ -1,0 +1,631 @@
+[
+  {
+    "conversation_id": "conv_001",
+    "course": "Introduction_to_Computing",
+    "conversation_length": "short",
+    "turns": [
+      {
+        "role": "user",
+        "content": "What are the prerequisites for this course?"
+      },
+      {
+        "role": "assistant",
+        "content": "The prerequisites for Introduction to Computing include basic programming knowledge and familiarity with fundamental computer science concepts."
+      },
+      {
+        "role": "user",
+        "content": "What about the grading policy?"
+      }
+    ],
+    "follow_up_queries": [
+      {
+        "query": "What about the grading policy?",
+        "turn_index": 2,
+        "references_previous": true,
+        "note": "Follow-up question referencing the course context from previous turn"
+      }
+    ]
+  },
+  {
+    "conversation_id": "conv_002",
+    "course": "Database_Systems",
+    "conversation_length": "short",
+    "turns": [
+      {
+        "role": "user",
+        "content": "How many credits is this course?"
+      },
+      {
+        "role": "assistant",
+        "content": "Database Systems is a 3-credit course."
+      },
+      {
+        "role": "user",
+        "content": "Tell me more about the topics covered"
+      }
+    ],
+    "follow_up_queries": [
+      {
+        "query": "Tell me more about the topics covered",
+        "turn_index": 2,
+        "references_previous": true,
+        "note": "Follow-up asking for more details about the course"
+      }
+    ]
+  },
+  {
+    "conversation_id": "conv_003",
+    "course": "Operating_Systems",
+    "conversation_length": "short",
+    "turns": [
+      {
+        "role": "user",
+        "content": "What is the final exam percentage?"
+      },
+      {
+        "role": "assistant",
+        "content": "The final exam accounts for 30% of the total grade in Operating Systems."
+      },
+      {
+        "role": "user",
+        "content": "And the midterm?"
+      }
+    ],
+    "follow_up_queries": [
+      {
+        "query": "And the midterm?",
+        "turn_index": 2,
+        "references_previous": true,
+        "note": "Short follow-up referencing exam context from previous turn"
+      }
+    ]
+  },
+  {
+    "conversation_id": "conv_004",
+    "course": "Data_Structures_and_AlgoriThms",
+    "conversation_length": "short",
+    "turns": [
+      {
+        "role": "user",
+        "content": "What topics are covered in this course?"
+      },
+      {
+        "role": "assistant",
+        "content": "The course covers arrays, linked lists, stacks, queues, trees, graphs, and various sorting and searching algorithms."
+      },
+      {
+        "role": "user",
+        "content": "How are these topics assessed?"
+      }
+    ],
+    "follow_up_queries": [
+      {
+        "query": "How are these topics assessed?",
+        "turn_index": 2,
+        "references_previous": true,
+        "note": "Follow-up referencing topics mentioned in previous answer"
+      }
+    ]
+  },
+  {
+    "conversation_id": "conv_005",
+    "course": "Software_Engineering",
+    "conversation_length": "short",
+    "turns": [
+      {
+        "role": "user",
+        "content": "What are the learning objectives?"
+      },
+      {
+        "role": "assistant",
+        "content": "The learning objectives include understanding software development lifecycle, design patterns, and project management principles."
+      },
+      {
+        "role": "user",
+        "content": "What prerequisites do I need?"
+      }
+    ],
+    "follow_up_queries": [
+      {
+        "query": "What prerequisites do I need?",
+        "turn_index": 2,
+        "references_previous": false,
+        "note": "New topic question, not directly referencing previous context"
+      }
+    ]
+  },
+  {
+    "conversation_id": "conv_006",
+    "course": "Introduction_to_Computing",
+    "conversation_length": "medium",
+    "turns": [
+      {
+        "role": "user",
+        "content": "What are the prerequisites?"
+      },
+      {
+        "role": "assistant",
+        "content": "The prerequisites for Introduction to Computing include basic programming knowledge and familiarity with fundamental computer science concepts."
+      },
+      {
+        "role": "user",
+        "content": "What about the grading policy?"
+      },
+      {
+        "role": "assistant",
+        "content": "The grading policy includes: Midterm exam 30%, Final exam 30%, Labs/Practices 10%, Projects 30%."
+      },
+      {
+        "role": "user",
+        "content": "How many credits is this course?"
+      },
+      {
+        "role": "assistant",
+        "content": "Introduction to Computing is a 3-credit course."
+      },
+      {
+        "role": "user",
+        "content": "What topics are covered?"
+      }
+    ],
+    "follow_up_queries": [
+      {
+        "query": "What about the grading policy?",
+        "turn_index": 2,
+        "references_previous": true,
+        "note": "Follow-up referencing course context"
+      },
+      {
+        "query": "What topics are covered?",
+        "turn_index": 6,
+        "references_previous": true,
+        "note": "Follow-up in longer conversation, referencing course context"
+      }
+    ]
+  },
+  {
+    "conversation_id": "conv_007",
+    "course": "Database_Systems",
+    "conversation_length": "medium",
+    "turns": [
+      {
+        "role": "user",
+        "content": "How many credits is this course?"
+      },
+      {
+        "role": "assistant",
+        "content": "Database Systems is a 3-credit course."
+      },
+      {
+        "role": "user",
+        "content": "What are the prerequisites?"
+      },
+      {
+        "role": "assistant",
+        "content": "The prerequisites include Data Structures and Algorithms, and basic knowledge of programming."
+      },
+      {
+        "role": "user",
+        "content": "Tell me about the final exam"
+      },
+      {
+        "role": "assistant",
+        "content": "The final exam accounts for 40% of the total grade and covers all course topics."
+      },
+      {
+        "role": "user",
+        "content": "And the midterm percentage?"
+      }
+    ],
+    "follow_up_queries": [
+      {
+        "query": "Tell me about the final exam",
+        "turn_index": 4,
+        "references_previous": true,
+        "note": "Follow-up in medium conversation"
+      },
+      {
+        "query": "And the midterm percentage?",
+        "turn_index": 6,
+        "references_previous": true,
+        "note": "Follow-up referencing exam context from previous turn"
+      }
+    ]
+  },
+  {
+    "conversation_id": "conv_008",
+    "course": "Operating_Systems",
+    "conversation_length": "medium",
+    "turns": [
+      {
+        "role": "user",
+        "content": "What is the grading policy?"
+      },
+      {
+        "role": "assistant",
+        "content": "The grading policy includes: Midterm exam 20%, Final exam 40%, Tutorial 10%, Projects 30%."
+      },
+      {
+        "role": "user",
+        "content": "What topics are covered?"
+      },
+      {
+        "role": "assistant",
+        "content": "The course covers process management, memory management, file systems, and concurrency."
+      },
+      {
+        "role": "user",
+        "content": "How are projects graded?"
+      },
+      {
+        "role": "assistant",
+        "content": "Projects are graded based on functionality, code quality, documentation, and presentation."
+      },
+      {
+        "role": "user",
+        "content": "What about the tutorial component?"
+      }
+    ],
+    "follow_up_queries": [
+      {
+        "query": "How are projects graded?",
+        "turn_index": 4,
+        "references_previous": true,
+        "note": "Follow-up referencing projects mentioned in grading policy"
+      },
+      {
+        "query": "What about the tutorial component?",
+        "turn_index": 6,
+        "references_previous": true,
+        "note": "Follow-up referencing tutorial from grading policy"
+      }
+    ]
+  },
+  {
+    "conversation_id": "conv_009",
+    "course": "Machine_Learning",
+    "conversation_length": "medium",
+    "turns": [
+      {
+        "role": "user",
+        "content": "What are the learning objectives?"
+      },
+      {
+        "role": "assistant",
+        "content": "The learning objectives include understanding supervised and unsupervised learning, neural networks, and model evaluation."
+      },
+      {
+        "role": "user",
+        "content": "What prerequisites are needed?"
+      },
+      {
+        "role": "assistant",
+        "content": "Prerequisites include Linear Algebra, Probability and Statistics, and Programming Fundamentals."
+      },
+      {
+        "role": "user",
+        "content": "What is the course schedule?"
+      },
+      {
+        "role": "assistant",
+        "content": "The course is scheduled for 3 hours per week, with lectures on Mondays and Wednesdays."
+      },
+      {
+        "role": "user",
+        "content": "Tell me more about the assignments"
+      }
+    ],
+    "follow_up_queries": [
+      {
+        "query": "Tell me more about the assignments",
+        "turn_index": 6,
+        "references_previous": true,
+        "note": "Follow-up in medium conversation"
+      }
+    ]
+  },
+  {
+    "conversation_id": "conv_010",
+    "course": "Computer_Networks",
+    "conversation_length": "medium",
+    "turns": [
+      {
+        "role": "user",
+        "content": "What topics are covered?"
+      },
+      {
+        "role": "assistant",
+        "content": "The course covers network protocols, TCP/IP, routing algorithms, and network security."
+      },
+      {
+        "role": "user",
+        "content": "How many credits?"
+      },
+      {
+        "role": "assistant",
+        "content": "Computer Networks is a 3-credit course."
+      },
+      {
+        "role": "user",
+        "content": "What about lab work?"
+      },
+      {
+        "role": "assistant",
+        "content": "The course includes weekly lab sessions covering network configuration and troubleshooting."
+      },
+      {
+        "role": "user",
+        "content": "How is the lab work graded?"
+      }
+    ],
+    "follow_up_queries": [
+      {
+        "query": "How is the lab work graded?",
+        "turn_index": 6,
+        "references_previous": true,
+        "note": "Follow-up referencing lab work from previous turn"
+      }
+    ]
+  },
+  {
+    "conversation_id": "conv_011",
+    "course": "Introduction_to_Computing",
+    "conversation_length": "long",
+    "turns": [
+      {
+        "role": "user",
+        "content": "What are the prerequisites?"
+      },
+      {
+        "role": "assistant",
+        "content": "The prerequisites for Introduction to Computing include basic programming knowledge and familiarity with fundamental computer science concepts."
+      },
+      {
+        "role": "user",
+        "content": "What about the grading policy?"
+      },
+      {
+        "role": "assistant",
+        "content": "The grading policy includes: Midterm exam 30%, Final exam 30%, Labs/Practices 10%, Projects 30%."
+      },
+      {
+        "role": "user",
+        "content": "How many credits is this course?"
+      },
+      {
+        "role": "assistant",
+        "content": "Introduction to Computing is a 3-credit course."
+      },
+      {
+        "role": "user",
+        "content": "What topics are covered?"
+      },
+      {
+        "role": "assistant",
+        "content": "The course covers programming fundamentals, data structures basics, algorithms introduction, and software development practices."
+      },
+      {
+        "role": "user",
+        "content": "Tell me about the projects"
+      },
+      {
+        "role": "assistant",
+        "content": "The course includes 3-4 programming projects that cover different aspects of the curriculum."
+      },
+      {
+        "role": "user",
+        "content": "What about the midterm exam format?"
+      }
+    ],
+    "follow_up_queries": [
+      {
+        "query": "What about the grading policy?",
+        "turn_index": 2,
+        "references_previous": true,
+        "note": "Early follow-up in long conversation"
+      },
+      {
+        "query": "What about the midterm exam format?",
+        "turn_index": 9,
+        "references_previous": true,
+        "note": "Follow-up referencing midterm from grading policy mentioned earlier"
+      }
+    ]
+  },
+  {
+    "conversation_id": "conv_012",
+    "course": "Database_Systems",
+    "conversation_length": "long",
+    "turns": [
+      {
+        "role": "user",
+        "content": "How many credits is this course?"
+      },
+      {
+        "role": "assistant",
+        "content": "Database Systems is a 3-credit course."
+      },
+      {
+        "role": "user",
+        "content": "What are the prerequisites?"
+      },
+      {
+        "role": "assistant",
+        "content": "The prerequisites include Data Structures and Algorithms, and basic knowledge of programming."
+      },
+      {
+        "role": "user",
+        "content": "Tell me about the final exam"
+      },
+      {
+        "role": "assistant",
+        "content": "The final exam accounts for 40% of the total grade and covers all course topics."
+      },
+      {
+        "role": "user",
+        "content": "And the midterm percentage?"
+      },
+      {
+        "role": "assistant",
+        "content": "The midterm exam accounts for 20% of the total grade."
+      },
+      {
+        "role": "user",
+        "content": "What topics are covered in the course?"
+      },
+      {
+        "role": "assistant",
+        "content": "The course covers relational database design, SQL, normalization, indexing, and transaction management."
+      },
+      {
+        "role": "user",
+        "content": "How are projects structured?"
+      }
+    ],
+    "follow_up_queries": [
+      {
+        "query": "Tell me about the final exam",
+        "turn_index": 4,
+        "references_previous": true,
+        "note": "Follow-up in long conversation"
+      },
+      {
+        "query": "How are projects structured?",
+        "turn_index": 9,
+        "references_previous": true,
+        "note": "Follow-up referencing projects from grading policy"
+      }
+    ]
+  },
+  {
+    "conversation_id": "conv_013",
+    "course": "Operating_Systems",
+    "conversation_length": "long",
+    "turns": [
+      {
+        "role": "user",
+        "content": "What is the grading policy?"
+      },
+      {
+        "role": "assistant",
+        "content": "The grading policy includes: Midterm exam 20%, Final exam 40%, Tutorial 10%, Projects 30%."
+      },
+      {
+        "role": "user",
+        "content": "What topics are covered?"
+      },
+      {
+        "role": "assistant",
+        "content": "The course covers process management, memory management, file systems, and concurrency."
+      },
+      {
+        "role": "user",
+        "content": "How are projects graded?"
+      },
+      {
+        "role": "assistant",
+        "content": "Projects are graded based on functionality, code quality, documentation, and presentation."
+      },
+      {
+        "role": "user",
+        "content": "What about the tutorial component?"
+      },
+      {
+        "role": "assistant",
+        "content": "Tutorial sessions include problem-solving exercises and discussions on course topics."
+      },
+      {
+        "role": "user",
+        "content": "Tell me about the midterm exam"
+      },
+      {
+        "role": "assistant",
+        "content": "The midterm exam covers the first half of the course material and includes both theoretical and practical questions."
+      },
+      {
+        "role": "user",
+        "content": "What is the format of the final exam?"
+      }
+    ],
+    "follow_up_queries": [
+      {
+        "query": "How are projects graded?",
+        "turn_index": 4,
+        "references_previous": true,
+        "note": "Follow-up referencing projects from grading policy"
+      },
+      {
+        "query": "What is the format of the final exam?",
+        "turn_index": 9,
+        "references_previous": true,
+        "note": "Follow-up referencing final exam from grading policy mentioned early in conversation"
+      }
+    ]
+  },
+  {
+    "conversation_id": "conv_014",
+    "course": "Software_Engineering",
+    "conversation_length": "long",
+    "turns": [
+      {
+        "role": "user",
+        "content": "What are the learning objectives?"
+      },
+      {
+        "role": "assistant",
+        "content": "The learning objectives include understanding software development lifecycle, design patterns, and project management principles."
+      },
+      {
+        "role": "user",
+        "content": "What prerequisites do I need?"
+      },
+      {
+        "role": "assistant",
+        "content": "Prerequisites include Object-Oriented Programming, Data Structures, and basic knowledge of software development."
+      },
+      {
+        "role": "user",
+        "content": "How many credits?"
+      },
+      {
+        "role": "assistant",
+        "content": "Software Engineering is a 3-credit course."
+      },
+      {
+        "role": "user",
+        "content": "What is the grading breakdown?"
+      },
+      {
+        "role": "assistant",
+        "content": "The grading breakdown includes: Assignments 30%, Midterm 20%, Final 30%, Project 20%."
+      },
+      {
+        "role": "user",
+        "content": "Tell me about the project requirements"
+      },
+      {
+        "role": "assistant",
+        "content": "The project requires students to work in teams to develop a complete software application following software engineering principles."
+      },
+      {
+        "role": "user",
+        "content": "How is the project graded?"
+      }
+    ],
+    "follow_up_queries": [
+      {
+        "query": "Tell me about the project requirements",
+        "turn_index": 8,
+        "references_previous": true,
+        "note": "Follow-up referencing project from grading breakdown"
+      },
+      {
+        "query": "How is the project graded?",
+        "turn_index": 9,
+        "references_previous": true,
+        "note": "Follow-up referencing project from previous turn"
+      }
+    ]
+  }
+]
+

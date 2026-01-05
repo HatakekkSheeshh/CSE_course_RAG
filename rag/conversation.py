@@ -25,7 +25,7 @@ class ConversationManager:
     of old conversations to prevent memory leaks.
     """
     
-    def __init__(self, max_conversations: int = 1000, max_history_per_conversation: int = 50):
+    def __init__(self, max_conversations: int = 1000, max_history_per_conversation: int = 10):
         """
         Initialize conversation manager.
         
