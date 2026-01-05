@@ -1,0 +1,194 @@
+\chapter{Results}
+\textit{In Chapter \thechapter, it presents experimental results comparing different RAG pipeline configurations.}
+
+\section{Answer Generation Quality}
+
+Table~\ref{tab:answer_quality} measures how well the system generates answers that are relevant to user queries and grounded in retrieved context. Two key metrics are analyzed: Query-Answer Semantic Similarity and Answer Faithfulness.
+
+\begin{table}[htbp]
+\centering
+\caption{Answer Generation Quality on CSE Course Materials}
+\label{tab:answer_quality}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Metric} & \textbf{Baseline} & \textbf{+ Query Rewriter} \\
+\hline
+Query-Answer Similarity & \textbf{0.4977} & 0.4723 \\
+\hline
+Answer Faithfulness & 0.3646 & \textbf{0.4414} \\
+\hline
+\end{tabular}
+\end{table}
+
+Query rewriting improves Answer Faithfulness by +21.1\% while slightly decreasing Query-Answer Similarity (-5.1\%). This trade-off prioritizes answer accuracy over direct query matching, reducing hallucination risk and ensuring answers are better grounded in retrieved context.
+
+\section{Retrieval Performance}
+
+Table~\ref{tab:retrieval_metrics} presents retrieval performance metrics for the two RAG configurations. These metrics measure the quality of retrieved chunks before answer generation.
+
+\begin{table}[htbp]
+\centering
+\caption{Retrieval Performance Metrics}
+\label{tab:retrieval_metrics}
+\resizebox{0.9\linewidth}{!}{%
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Configuration} & \textbf{Query-Chunk Similarity} & \textbf{Top Chunk Score} \\
+\hline
+RAG Baseline (FAISS + Reranker) & \textbf{0.2453} & -3.0721 \\
+\hline
+RAG + Query Rewriter & 0.1770 & \textbf{-0.5875} \\
+\hline
+\end{tabular}
+}
+\end{table}
+
+While Query-Chunk Similarity decreases (-27.8\%), Top Chunk Score improves significantly (+80.9\%). Query rewriting helps the reranker identify a highly relevant chunk at the top position, which is critical for answer generation. This improvement contributes to the +21.1\% gain in Answer Faithfulness.
+
+\section{Impact of Query Rewriting}
+
+Table~\ref{tab:query_rewriter_impact} compares the RAG baseline against the query rewriting variant.
+
+\begin{table}[htbp]
+\centering
+\caption{Impact of Query Rewriting on Answer Quality}
+\label{tab:query_rewriter_impact}
+\resizebox{0.9\linewidth}{!}{%
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Configuration} & \textbf{Query-Answer Sim} & \textbf{Answer Faithfulness} & \textbf{Top Chunk Score} \\
+\hline
+RAG Baseline (FAISS + Reranker) & \textbf{0.4977} & 0.3646 & -3.0721 \\
+\hline
+RAG + Query Rewriter & 0.4723 & \textbf{0.4414} & -0.5875 \\
+\hline
+\textbf{Improvement} & \textbf{-0.0254 (-5.1\%)} & \textbf{+0.0768 (+21.1\%)} & \textbf{+2.4846 (+80.9\%)} \\
+\hline
+\end{tabular}%
+}
+\end{table}
+
+Query rewriting improves Answer Faithfulness (+21.1\%) and Top Chunk Score (+80.9\%) with a minor decrease in Query-Answer Similarity (-5.1\%). Rewritten queries better align with document embeddings, particularly benefiting ambiguous queries.
+
+\subsection{Impact by Query Type}
+
+Table~\ref{tab:query_type_impact} shows query rewriting impact by query type.
+
+\begin{table}[htbp]
+\centering
+\caption{Query Rewriting Impact by Query Type}
+\label{tab:query_type_impact}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Query Type} & \textbf{Baseline} & \textbf{+ Rewriter} & \textbf{\ensuremath{\Delta} Change} \\
+\hline
+Specific & 0.5797 & \textbf{0.6171} & +0.0375 (+6.5\%) \\
+\hline
+Full Question & 0.7476 & \textbf{0.7661} & +0.0185 (+2.5\%) \\
+\hline
+Short Ambiguous & \textbf{0.4494} & 0.4126 & -0.0368 (-8.2\%) \\
+\hline
+Course Info & \textbf{0.4837} & 0.4530 & -0.0307 (-6.3\%) \\
+\hline
+\end{tabular}
+\end{table}
+
+Specific queries benefit most (+6.5\%), while short ambiguous and course info queries show decreases due to over-expansion. Full questions show marginal improvement as they are already well-formed.
+
+\section{System Performance}
+
+Table~\ref{tab:performance} presents latency and throughput measurements for the two baseline configurations, highlighting the trade-offs between quality and performance.
+
+\begin{table}[htbp]
+\centering
+\caption{System Performance Benchmarks}
+\label{tab:performance}
+\begin{tabular}{|l|c|c|}
+\hline
+\textbf{Configuration} & \textbf{Avg Latency (s)} & \textbf{Throughput (qps)} \\
+\hline
+RAG Baseline (FAISS + Reranker) & 80.97 & 0.0124 \\
+\hline
+RAG + Query Rewriter & 72.49 & 0.0138 \\
+\hline
+\textbf{Improvement} & \textbf{-8.47 (-10.5\%)} & \textbf{+0.0014 (+11.7\%)} \\
+\hline
+\end{tabular}
+\end{table}
+
+Query rewriting improves performance: latency decreases by 10.5\% and throughput increases by 11.7\%. Rewritten queries enable more efficient retrieval and faster reranker convergence. The improvement is most significant for short ambiguous queries (-30.6\% latency).
+
+\subsection{Performance Breakdown by Query Type}
+
+Table~\ref{tab:performance_by_type} shows latency breakdown by query type, revealing where query rewriting provides the most performance benefit.
+
+\begin{table}[htbp]
+\centering
+\caption{Latency by Query Type}
+\label{tab:performance_by_type}
+\begin{tabular}{|l|c|c|c|}
+\hline
+\textbf{Query Type} & \textbf{Baseline (s)} & \textbf{+ Rewriter (s)} & \textbf{Improvement} \\
+\hline
+Short Ambiguous & 103.41 & 71.81 & -30.6\% \\
+\hline
+Course Info & 65.94 & 75.46 & +14.4\% \\
+\hline
+Specific & 39.16 & 79.28 & +102.5\% \\
+\hline
+Full Question & 42.25 & 62.13 & +47.1\% \\
+\hline
+\end{tabular}
+\end{table}
+
+Short ambiguous queries show the largest latency improvement (-30.6\%), while specific queries experience increased latency (+102.5\%), indicating rewriting is unnecessary for well-formed queries.
+
+\section{Qualitative Analysis}
+
+This section presents qualitative examples comparing different configurations on representative queries, illustrating when query rewriting is most effective.
+
+\textbf{Example 1: Successful Expansion (Short Ambiguous Query)}
+\begin{itemize}
+    \item \textbf{Original Query}: "prerequisites"
+    \item \textbf{Rewritten Query}: "prerequisites for the Introduction to Computing course, including any required knowledge in computer programming languages such as Python or Java, familiarity with basic data structures like arrays and linked lists, understanding of fundamental algorithms such as sorting and searching, and proficiency in using a text editor or integrated development environment (IDE) for writing code. Additionally, what grading criteria will be used for assignments and exams in this course?"
+    \item \textbf{Course}: Introduction\_to\_Computing
+    \item \textbf{Similarity Change}: +0.0480 (improved)
+    \item \textbf{Analysis}: Successful expansion adds course-specific context, improving retrieval relevance.
+\end{itemize}
+
+\textbf{Example 2: Over-Expansion (Short Ambiguous Query)}
+\begin{itemize}
+    \item \textbf{Original Query}: "prerequisites"
+    \item \textbf{Rewritten Query}: "prerequisites for the Database Systems course, including any required knowledge in database management systems, programming languages such as SQL, and understanding of relational databases. Additionally, what are the specific prerequisites needed to successfully complete this course?"
+    \item \textbf{Course}: Database\_Systems
+    \item \textbf{Similarity Change}: -0.0089 (decreased)
+    \item \textbf{Analysis}: Over-expansion adds terms (SQL, relational databases) not present in materials, causing slight similarity decrease.
+\end{itemize}
+
+\textbf{Example 3: Best Improvement Case (Course Info Query)}
+\begin{itemize}
+    \item \textbf{Original Query}: "grading policy"
+    \item \textbf{Rewritten Query}: "What are the grading policies for the Operating Systems course, including details on how assignments, exams, and participation will contribute to my final grade? Additionally, please specify any late submission policies, make-up exam procedures, and criteria for extra credit opportunities."
+    \item \textbf{Course}: Operating\_Systems
+    \item \textbf{Baseline Similarity}: 0.4747
+    \item \textbf{With Rewriter}: 0.6143
+    \item \textbf{Improvement}: +0.1396 (+29.4\%)
+    \item \textbf{Analysis}: Best case. Expansion transforms general query into comprehensive question matching document structure.
+\end{itemize}
+
+\textbf{Example 4: Worst Case (Already Specific Query)}
+\begin{itemize}
+    \item \textbf{Original Query}: "midterm"
+    \item \textbf{Course}: Discrete\_Structures\_for\_Computing
+    \item \textbf{Baseline Similarity}: 0.5262
+    \item \textbf{With Rewriter}: 0.1774
+    \item \textbf{Decrease}: -0.3488 (-66.3\%)
+    \item \textbf{Analysis}: Worst case. Already-specific query is over-expanded, changing intent. Materials may lack detailed midterm information.
+\end{itemize}
+
+Query rewriting is most effective for ambiguous queries (e.g., "prerequisites", "grading policy") when expansion adds relevant context without over-expanding. It is least effective for already-specific queries (e.g., "midterm") where expansion may change intent or materials lack requested information.
+
+\textbf{Summary:} 7/20 queries (35\%) show improved similarity. Best: +29.4\% ("grading policy"). Worst: -66.3\% ("midterm").
+
+Despite mixed individual query results (35\% improved, 65\% decreased similarity), Answer Faithfulness improves by +21.1\% across all queries, indicating rewriting consistently improves answer accuracy by retrieving better context.
+
