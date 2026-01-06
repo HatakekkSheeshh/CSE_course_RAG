@@ -75,13 +75,20 @@ def get_query_rewriting_enabled() -> bool:
 
 
 def get_query_rewriter_temperature() -> float:
-    """Get query rewriter temperature."""
-    return float(os.getenv("QUERY_REWRITER_TEMPERATURE", "0.1"))  # Lower for more deterministic rewriting
+    """
+    Get query rewriter temperature.
+    
+    Temperature controls the creativity/randomness of LLM output:
+    - Low (0.1-0.3): More deterministic, consistent rewrites
+    - High (0.7-1.0+): More creative, diverse rewrites
+    
+    """
+    return float(os.getenv("QUERY_REWRITER_TEMPERATURE", "0.1"))  
 
 
 def get_query_rewriter_max_tokens() -> int:
     """Get query rewriter max tokens."""
-    return int(os.getenv("QUERY_REWRITER_MAX_TOKENS", "250"))  # Increased to allow longer rewritten queries
+    return int(os.getenv("QUERY_REWRITER_MAX_TOKENS", "250"))  
 
 
 # ============================================================================

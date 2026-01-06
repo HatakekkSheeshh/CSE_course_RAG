@@ -72,6 +72,19 @@ OLLAMA_BASE_URL=http://host.docker.internal:11434  # Windows/Mac Docker Desktop
 OLLAMA_BASE_URL=http://ollama:11434  # If Ollama is in the same docker-compose network
 ```
 
+**Option C: Qwen (via Ollama - Recommended for Vietnamese/Multilingual)**
+```env
+LLM_PROVIDER=qwen
+QWEN_MODEL=qwen2.5:3b  # Install: docker compose exec ollama ollama pull qwen2.5:3b
+QWEN_BASE_URL=http://ollama:11434  # Use http://host.docker.internal:11434 if Ollama is on host
+```
+
+**Note:** Qwen models are excellent for multilingual tasks including Vietnamese. Available models:
+- `qwen2.5:0.5b` - Very fast, ~400MB
+- `qwen2.5:1.5b` - Fast, ~1GB
+- `qwen2.5:3b` - Balanced speed/quality, ~2GB (recommended)
+- `qwen2.5:7b` - High quality, ~4.5GB
+
 **Query Rewriting** (optional but recommended):
 ```env
 ENABLE_QUERY_REWRITING=true          # Enable query rewriting (default: true)
@@ -86,6 +99,65 @@ docker compose up --build
 Services:
 - `backend` – FastAPI on `http://localhost:8000`
 - `frontend` – Vite dev server on `http://localhost:5173`
+
+**Recreating Backend After Changing .env:**
+
+If you modify the `.env` file, you need to recreate the backend container to apply the changes:
+
+```bash
+# Recreate only the backend service
+docker compose up -d --force-recreate --build backend
+```
+
+Or recreate all services:
+```bash
+docker compose up -d --force-recreate --build
+```
+
+**Accessing Backend Container:**
+
+To access the backend container and run CLI tasks (e.g., indexing, query testing):
+
+```bash
+docker compose exec backend bash
+```
+
+Once inside the container, you can run commands like:
+```bash
+# Run indexing
+python run.py --index
+
+# Test query
+python -m rag.query_cli --question "What is the grading policy?"
+
+# Run evaluation scripts
+python evaluation/evaluate_rewriter_impact.py --queries evaluation/test_queries_extended.json
+```
+
+**Pulling Ollama Models:**
+
+If you encounter "model not found" errors, you need to pull the model in the Ollama container:
+
+```bash
+# Access Ollama container
+docker compose exec ollama bash
+
+# List available models
+ollama list
+
+# Pull Qwen model (recommended: qwen2.5:3b)
+ollama pull qwen2.5:3b
+
+# Or pull other Qwen models
+ollama pull qwen2.5:0.5b  # Very fast, ~400MB
+ollama pull qwen2.5:1.5b  # Fast, ~1GB
+ollama pull qwen2.5:7b    # High quality, ~4.5GB
+```
+
+Alternatively, pull from host machine:
+```bash
+docker compose exec ollama ollama pull qwen2.5:3b
+```
 
 ### 3. Query
 - Visit the UI at `http://localhost:5173` to chat.
@@ -130,10 +202,70 @@ Populate `data/raw/<CourseName>/` with PDFs before running the pipeline.
 
 ## Evaluation
 
-Evaluate RAG system performance (requires `pip install rouge-score`): `python3 scripts/evaluate_rag_system.py --queries scripts/test_queries.json --output scripts/evaluation_results.json`.  
-Fill LaTeX tables from results: `python3 scripts/fill_results_tables.py --results scripts/evaluation_results.json --tex overleaf-report/AI_PROJECT_REPORT/experiements/results.tex`.  
-Create visualizations (requires `pip install matplotlib numpy`): `python3 scripts/create_visualizations.py --results scripts/evaluation_results.json --output-dir overleaf-report/AI_PROJECT_REPORT/figures`.  
-Additional analysis scripts: `scripts/collect_dataset_stats.py`, `scripts/analyze_parsed_data_quality.py`.
+### Query Rewriter Impact Evaluation
+
+Evaluate the impact of query rewriting on RAG system performance. Compares baseline (no rewriting) vs. with query rewriting:
+
+**Metrics:**
+- Retrieval Quality: Query-Chunk Semantic Similarity
+- Answer Quality: Query-Answer Semantic Similarity
+- Answer Faithfulness: Answer-Chunk Overlap
+- Latency: Response time comparison
+
+**Basic usage:**
+```bash
+python3 evaluation/evaluate_rewriter_impact.py --queries evaluation/test_queries_extended.json
+```
+
+**With custom output:**
+```bash
+python3 evaluation/evaluate_rewriter_impact.py \
+  --queries evaluation/test_queries_extended.json \
+  --output evaluation/rewriter_evaluation_results.json
+```
+
+**Arguments:**
+- `--queries`: Path to test queries JSON file (default: `evaluation/test_queries_extended.json`)
+- `--output`: Path to output results JSON file (default: `evaluation/rewriter_evaluation_results.json`)
+
+### Conversation Context Memory Evaluation
+
+Evaluate conversation context memory effectiveness with three metrics:
+1. Context Utilization Rate: Percentage of follow-up queries that successfully reference previous context
+2. Context Window Effectiveness: Answer quality across different conversation lengths
+3. Follow-up Query Quality: Comparison of answer quality with/without context
+
+**Basic usage:**
+```bash
+python3 evaluation/evaluate_conversation_context.py --conversations evaluation/test_conversations.json
+```
+
+**With custom output and threshold:**
+```bash
+python evaluation/evaluate_conversation_context.py \
+  --conversations evaluation/test_conversations.json \
+  --output evaluation/conversation_context_results.json \
+  --threshold 0.3
+```
+
+**Arguments:**
+- `--conversations`: Path to test conversations JSON file (default: `evaluation/test_conversations.json`)
+- `--output`: Path to output results JSON file (default: `evaluation/conversation_context_results.json`)
+- `--threshold`: Context utilization similarity threshold (default: `0.3`)
+
+### Dataset Statistics
+
+Collect dataset statistics (courses, documents, chunks, tokens):
+```bash
+python evaluation/collect_dataset_stats.py
+```
+
+**With custom paths:**
+```bash
+python evaluation/collect_dataset_stats.py \
+  --data-root ./data \
+  --index-dir ./data/indices
+```
 
 ---
 

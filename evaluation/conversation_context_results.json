@@ -1,0 +1,63 @@
+{
+  "conversations": [],
+  "metrics": {
+    "context_utilization_rate": {
+      "baseline": 0.0,
+      "rewriter": 0.0
+    },
+    "context_window_effectiveness": {
+      "short": {
+        "baseline": {
+          "count": 0,
+          "avg_query_answer_sim": 0.0,
+          "avg_answer_faithfulness": 0.0
+        },
+        "rewriter": {
+          "count": 0,
+          "avg_query_answer_sim": 0.0,
+          "avg_answer_faithfulness": 0.0
+        }
+      },
+      "medium": {
+        "baseline": {
+          "count": 0,
+          "avg_query_answer_sim": 0.0,
+          "avg_answer_faithfulness": 0.0
+        },
+        "rewriter": {
+          "count": 0,
+          "avg_query_answer_sim": 0.0,
+          "avg_answer_faithfulness": 0.0
+        }
+      },
+      "long": {
+        "baseline": {
+          "count": 0,
+          "avg_query_answer_sim": 0.0,
+          "avg_answer_faithfulness": 0.0
+        },
+        "rewriter": {
+          "count": 0,
+          "avg_query_answer_sim": 0.0,
+          "avg_answer_faithfulness": 0.0
+        }
+      }
+    },
+    "follow_up_quality_improvement": {
+      "baseline": {
+        "query_answer_similarity_improvement": 0.0,
+        "answer_faithfulness_improvement": 0.0
+      },
+      "rewriter": {
+        "query_answer_similarity_improvement": 0.0,
+        "answer_faithfulness_improvement": 0.0
+      }
+    },
+    "summary": {
+      "total_conversations": 0,
+      "total_follow_up_queries": 0
+    }
+  },
+  "note": "This is a placeholder results file. Run 'python evaluation/evaluate_conversation_context.py' to generate actual results."
+}
+
