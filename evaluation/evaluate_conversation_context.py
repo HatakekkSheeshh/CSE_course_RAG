@@ -19,6 +19,7 @@ from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, asdict
 import argparse
 import warnings
+import hashlib
 
 warnings.filterwarnings("ignore")
 import os
@@ -75,13 +76,86 @@ class ConversationResult:
     rewriter_results: List[FollowUpResult]
 
 
+class LLMCache:
+    """Cache for LLM responses to avoid redundant API calls."""
+    
+    def __init__(self, cache_file: str = "evaluation/llm_cache.json"):
+        self.cache_file = Path(cache_file)
+        self.cache = self._load_cache()
+        self.hits = 0
+        self.misses = 0
+    
+    def _load_cache(self) -> Dict:
+        if self.cache_file.exists():
+            try:
+                with open(self.cache_file, 'r', encoding='utf-8') as f:
+                    return json.load(f)
+            except:
+                return {}
+        return {}
+    
+    def _save_cache(self):
+        try:
+            self.cache_file.parent.mkdir(parents=True, exist_ok=True)
+            with open(self.cache_file, 'w', encoding='utf-8') as f:
+                json.dump(self.cache, f, indent=2, ensure_ascii=False)
+        except Exception as e:
+            print(f"Warning: Failed to save LLM cache: {e}")
+    
+    def _get_cache_key(self, query: str, contexts: List[str], conversation_history: Optional[str]) -> str:
+        """Generate cache key from inputs."""
+        key_data = {
+            "query": query[:200],  # Truncate for key
+            "contexts": [c[:100] for c in contexts[:3]],  # Use first 3 contexts
+            "history": (conversation_history or "")[:200]
+        }
+        key_str = json.dumps(key_data, sort_keys=True)
+        return hashlib.md5(key_str.encode()).hexdigest()
+    
+    def get(self, query: str, contexts: List[str], conversation_history: Optional[str]) -> Optional[str]:
+        """Get cached response."""
+        key = self._get_cache_key(query, contexts, conversation_history)
+        if key in self.cache:
+            self.hits += 1
+            return self.cache[key]
+        self.misses += 1
+        return None
+    
+    def set(self, query: str, contexts: List[str], conversation_history: Optional[str], response: str):
+        """Cache response."""
+        key = self._get_cache_key(query, contexts, conversation_history)
+        self.cache[key] = response
+        # Save every 10 new entries
+        if self.misses % 10 == 0:
+            self._save_cache()
+    
+    def save(self):
+        """Force save cache."""
+        self._save_cache()
+    
+    def get_stats(self) -> str:
+        """Get cache statistics."""
+        total = self.hits + self.misses
+        hit_rate = (self.hits / total * 100) if total > 0 else 0
+        return f"Cache: {self.hits} hits, {self.misses} misses ({hit_rate:.1f}% hit rate)"
+
+
 class ConversationContextEvaluator:
     """Evaluator for conversation context memory."""
     
-    def __init__(self, context_similarity_threshold: float = 0.3):
+    def __init__(self, context_similarity_threshold: float = 0.3, use_cache: bool = True):
         print("Initializing conversation context evaluator...")
         self.embedding = Embedding()
         self.context_similarity_threshold = context_similarity_threshold
+        
+        # Initialize LLM cache
+        self.use_cache = use_cache
+        if use_cache:
+            self.llm_cache = LLMCache()
+            print("LLM caching: enabled")
+        else:
+            self.llm_cache = None
+            print("LLM caching: disabled")
         
         # Initialize LLM
         try:
@@ -185,14 +259,22 @@ class ConversationContextEvaluator:
         # Generate answer with conversation history
         answer = ""
         if self.llm_client and self.llm_client.enabled and chunk_texts:
-            try:
-                answer = self.llm_client.generate_answer(
-                    query=query,
-                    contexts=chunk_texts,
-                    conversation_history=conversation_history
-                )
-            except:
-                answer = chunk_texts[0] if chunk_texts else ""
+            # Check cache first
+            if self.llm_cache:
+                answer = self.llm_cache.get(query, chunk_texts, conversation_history)
+            
+            if not answer:
+                try:
+                    answer = self.llm_client.generate_answer(
+                        query=query,
+                        contexts=chunk_texts,
+                        conversation_history=conversation_history
+                    )
+                    # Cache the response
+                    if self.llm_cache and answer:
+                        self.llm_cache.set(query, chunk_texts, conversation_history, answer)
+                except:
+                    answer = chunk_texts[0] if chunk_texts else ""
         else:
             answer = chunk_texts[0] if chunk_texts else ""
         
@@ -228,14 +310,22 @@ class ConversationContextEvaluator:
         # Generate answer without conversation history
         answer = ""
         if self.llm_client and self.llm_client.enabled and chunk_texts:
-            try:
-                answer = self.llm_client.generate_answer(
-                    query=query,
-                    contexts=chunk_texts,
-                    conversation_history=None
-                )
-            except:
-                answer = chunk_texts[0] if chunk_texts else ""
+            # Check cache first
+            if self.llm_cache:
+                answer = self.llm_cache.get(query, chunk_texts, None)
+            
+            if not answer:
+                try:
+                    answer = self.llm_client.generate_answer(
+                        query=query,
+                        contexts=chunk_texts,
+                        conversation_history=None
+                    )
+                    # Cache the response
+                    if self.llm_cache and answer:
+                        self.llm_cache.set(query, chunk_texts, None, answer)
+                except:
+                    answer = chunk_texts[0] if chunk_texts else ""
         else:
             answer = chunk_texts[0] if chunk_texts else ""
         
@@ -429,6 +519,11 @@ class ConversationContextEvaluator:
             results.append(result)
             print()
         
+        # Save cache and print stats
+        if self.llm_cache:
+            self.llm_cache.save()
+            print(f"\n{self.llm_cache.get_stats()}")
+        
         return {"conversations": results}
     
     def calculate_metrics(self, results: Dict) -> Dict:
@@ -588,6 +683,11 @@ def main():
         default=0.3,
         help="Context utilization similarity threshold (default: 0.3)"
     )
+    parser.add_argument(
+        "--no-cache",
+        action="store_true",
+        help="Disable LLM response caching (slower but ensures fresh responses)"
+    )
     
     args = parser.parse_args()
     
@@ -601,7 +701,10 @@ def main():
         conversations = json.load(f)
     
     # Run evaluation
-    evaluator = ConversationContextEvaluator(context_similarity_threshold=args.threshold)
+    evaluator = ConversationContextEvaluator(
+        context_similarity_threshold=args.threshold,
+        use_cache=not args.no_cache
+    )
     results = evaluator.run_evaluation(conversations)
     
     # Calculate metrics
@@ -615,15 +718,9 @@ def main():
     output_path.parent.mkdir(parents=True, exist_ok=True)
     
     # Convert dataclasses to dict for JSON serialization
-    def convert_to_dict(obj):
-        if hasattr(obj, "__dict__"):
-            return {k: convert_to_dict(v) for k, v in obj.__dict__.items()}
-        elif isinstance(obj, list):
-            return [convert_to_dict(item) for item in obj]
-        else:
-            return obj
-    
-    results_dict = convert_to_dict(results)
+    results_dict = {
+        "conversations": [asdict(conv) for conv in results["conversations"]]
+    }
     results_dict["metrics"] = metrics
     
     with open(output_path, "w", encoding="utf-8") as f:

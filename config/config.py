@@ -26,17 +26,8 @@ def get_llm_provider() -> str:
     Note: 'qwen' uses Ollama under the hood with qwen model.
     """
     # Check MODEL_USING first (new, clearer flag)
-    model_using = os.getenv("MODEL_USING", "").lower()
-    if model_using in ("gemini", "ollama", "qwen"):
-        return model_using
-    
-    # Fallback to LLM_PROVIDER (legacy support)
-    provider = os.getenv("LLM_PROVIDER", "gemini").lower()
-    # Validate and fallback to gemini if invalid
-    if provider not in ("gemini", "ollama", "qwen"):
-        return "gemini"
-    return provider
-
+    model_using = os.getenv("MODEL_USING", "gemini").lower()
+    return model_using
 
 def get_qwen_config() -> tuple[str, str]:
     """Get Qwen configuration: (model, base_url). Uses Ollama as backend."""
@@ -217,7 +208,6 @@ def get_llm_provider_config() -> dict:
         config.update({"model": model, "base_url": base_url})
     elif provider == "qwen":
         model, base_url = get_qwen_config()
-        # Qwen uses Ollama backend, so we mark it as ollama internally
         config.update({"model": model, "base_url": base_url, "backend": "ollama"})
     
     return config

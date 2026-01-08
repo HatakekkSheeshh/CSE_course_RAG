@@ -37,5 +37,6 @@ python-dotenv  # Environment variable management
 # optional: qdrant support
 # qdrant-client
 
-# evaluation
+# evaluation & testing
 rouge-score
+pytest-cov
